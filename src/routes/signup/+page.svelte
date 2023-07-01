@@ -2,11 +2,11 @@
     import googleLogo from '$lib/images/google_logo.png'
 
     import { initializeApp } from "firebase/app";
+    import { goto } from '$app/navigation';
 	import { getAnalytics } from "firebase/analytics";
 	import 'firebase/auth';
 	import { onMount } from "svelte";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from "firebase/auth";
-	import { goto } from '$app/navigation';
+    import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from "firebase/auth";
 
     var passwordValue = ""
     var emailValue = ""
@@ -34,7 +34,7 @@
             .then((result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (credential) {
-                    goto("/")
+                    goto("/");
                 }
             }).catch((error) => {
                 const errorCode = error.code;
@@ -42,14 +42,15 @@
                 const email = error.customData.email;
                 const credential = GoogleAuthProvider.credentialFromError(error);
             });
-        console.log(getAuth().currentUser)
     }
 
     function loginWithPassword() {
         const auth = getAuth();
-        signInWithEmailAndPassword(auth, emailValue, passwordValue)
+        createUserWithEmailAndPassword(auth, emailValue, passwordValue)
         .then((userCredential) => {
-            goto("/")
+            if (userCredential) {
+                goto("/");
+            }
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -70,11 +71,11 @@
                 <label for="exampleInputPassword1">Password</label>
                 <input type="password" class="form-control" bind:value={passwordValue} placeholder="Password">
             </div>
-            <button type="submit" class="btn btn-primary w-100" on:click={loginWithPassword}>Login</button>
+            <button type="submit" class="btn btn-primary w-100" on:click={loginWithPassword}>Sign up</button>
         </form>
         <button class="btn btn-light border-black w-100 mt-4 d-flex-inline flex-row" on:click={loginWithGoogle}>
             <img src={googleLogo} alt="Google Logo" class="mx-1" style="width: 1.5rem;"/>
-            Login with Google
+            Sign up with Google
         </button>
     </div>
 </section>
