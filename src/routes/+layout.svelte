@@ -12,7 +12,7 @@
 		</form>
 	</nav>
 
-	<main>
+	<main class="d-flex flex-col justify-content-center align-items-center">
 		<slot />
 	</main>
 </div>
