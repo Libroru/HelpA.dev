@@ -48,7 +48,7 @@
     function loginWithPassword() {
         const auth = getAuth();
         signInWithEmailAndPassword(auth, emailValue, passwordValue)
-        .then((userCredential) => {
+        .then(() => {
             goto("/")
         })
         .catch((error) => {

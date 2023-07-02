@@ -7,7 +7,7 @@
 	import { initializeApp } from "firebase/app";
 	import { getAnalytics } from "firebase/analytics";
 	import { onMount } from "svelte";
-	import { getAuth } from "firebase/auth";
+	import { getAuth, onAuthStateChanged } from "firebase/auth";
 	import { goto } from '$app/navigation';
 
 	var userLoggedIn = false;
@@ -27,9 +27,14 @@
 		const app = initializeApp(firebaseConfig);
 		const analytics = getAnalytics(app);
 
-		if(getAuth().currentUser?.email != "") {
-			userLoggedIn = true;
-		}
+		const auth = getAuth();
+		onAuthStateChanged(auth, (user) => {
+			if (user) {
+				userLoggedIn = true;
+			} else {
+				userLoggedIn = false;
+			}
+		});
 	});
 
 </script>

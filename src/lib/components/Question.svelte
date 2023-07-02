@@ -1,30 +1,16 @@
 <script>
-    import googleLogo from '$lib/images/google_logo.png'
-
-    import { initializeApp } from "firebase/app";
-    import { goto } from '$app/navigation';
-	import { getAnalytics } from "firebase/analytics";
-	import 'firebase/auth';
-	import { onMount } from "svelte";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from "firebase/auth";
     
-	onMount(async () => {
-		const firebaseConfig = {
-			apiKey: "AIzaSyChIG9JVOAY-ayR0zylRfARKbycrHCVmkk",
-			authDomain: "helpadev.firebaseapp.com",
-			projectId: "helpadev",
-			storageBucket: "helpadev.appspot.com",
-			messagingSenderId: "164373117763",
-			appId: "1:164373117763:web:6f3a45d2e2d89304b5cdf6",
-			measurementId: "G-RY0CH1Z9SQ"
-		};
-
-		// Initialize Firebase
-		const app = initializeApp(firebaseConfig);
-		const analytics = getAnalytics(app);
-	});
 </script>
 
-<div>
-    
+<div class="card p-4" style="width: 500px;">
+    <a href="/">How do I center a div?</a>
+	<p>Hey everyone, I am currently developing a website,
+		where other developers can ask questions about certain topic and ideas and get help immediately from others...</p>
+	<div class="d-inline-flex" style="gap: 5px;">
+		<span>tags:</span>
+		<span class="card px-1 bg-info text-white" style="width: fit-content;">html</span>
+		<span class="card px-1 bg-info text-white" style="width: fit-content;">css</span>
+		<span class="card px-1 bg-info text-white" style="width: fit-content;">web</span>
+		<span class="card px-1 bg-info text-white" style="width: fit-content;">help</span>
+	</div>
 </div>

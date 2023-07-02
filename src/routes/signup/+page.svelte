@@ -1,7 +1,8 @@
-<script>
+<script lang="ts">
     import googleLogo from '$lib/images/google_logo.png'
 
     import { initializeApp } from "firebase/app";
+    import { getFirestore, doc, setDoc } from 'firebase/firestore';
     import { goto } from '$app/navigation';
 	import { getAnalytics } from "firebase/analytics";
 	import 'firebase/auth';
@@ -11,8 +12,9 @@
     var passwordValue = ""
     var emailValue = ""
 
-	onMount(async () => {
-		const firebaseConfig = {
+    let app: any;
+
+    const firebaseConfig = {
 			apiKey: "AIzaSyChIG9JVOAY-ayR0zylRfARKbycrHCVmkk",
 			authDomain: "helpadev.firebaseapp.com",
 			projectId: "helpadev",
@@ -20,20 +22,25 @@
 			messagingSenderId: "164373117763",
 			appId: "1:164373117763:web:6f3a45d2e2d89304b5cdf6",
 			measurementId: "G-RY0CH1Z9SQ"
-		};
+    };
 
-		// Initialize Firebase
-		const app = initializeApp(firebaseConfig);
+	onMount(async () => {
+		app = initializeApp(firebaseConfig);
 		const analytics = getAnalytics(app);
 	});
 
     function loginWithGoogle() {
         const provider = new GoogleAuthProvider();
         const auth = getAuth();
+        const db = getFirestore(app);
         signInWithPopup(auth, provider)
-            .then((result) => {
+            .then(async (result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (credential) {
+                    await setDoc(doc(db, 'users', String(result.user.uid)), {
+                        "userEmail": result.user.email,
+                        "userName": "username"
+                    });
                     goto("/");
                 }
             }).catch((error) => {
@@ -46,9 +53,14 @@
 
     function loginWithPassword() {
         const auth = getAuth();
+        const db = getFirestore(app);
         createUserWithEmailAndPassword(auth, emailValue, passwordValue)
-        .then((userCredential) => {
-            if (userCredential) {
+        .then(async (result) => {
+            if (result) {
+                await setDoc(doc(db, 'users', String(result.user.uid)), {
+                        "userEmail": result.user.email,
+                        "userName": "username"
+                    });
                 goto("/");
             }
         })
