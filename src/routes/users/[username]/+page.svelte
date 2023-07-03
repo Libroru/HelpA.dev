@@ -30,16 +30,13 @@
         const db = getFirestore(app);
         const usersRef = collection(db, "users");
         const querySnapshot = await getDocs(query(usersRef, where("userName", "==", username)));
-
-        querySnapshot.forEach(async (doc) => {
+        querySnapshot.forEach(async (doc: any) => {
             userData = doc.data();
             joinDate = new Date(userData.joinDate.seconds * 1000).toDateString()
             for (const friendRef of userData.friends) {
                 const friendDoc = await getDoc(friendRef);
                 const friendData: any = friendDoc.data();
                 friends = [...friends, friendData.userName]
-                console.log(friendData.userName);
-                console.log(friends);
             }
         });
 
@@ -48,17 +45,18 @@
 </script>
 
 <section>
-    <div class="card py-2 text-left">
-        <span>{username}</span>
-        <span>Joined: {joinDate}</span>
-    </div>
+    {#if dataLoaded}
+        <div class="card p-2 text-left">
+            <span>{username}</span>
+            <span>Joined: {joinDate}</span>
+        </div>
 
-    <div class="d-flex flex-column">
-        <span>Friends:</span>
-        {#if dataLoaded}
+        <div class="d-flex flex-column">
+            <span>Friends:</span>
             {#each friends as friend}
-                <a rel="external" href="/users/{friend}">{friend}</a>
-            {/each}
-        {/if}
-    </div>
+                    <a rel="external" href="/users/{friend}">{friend}</a>
+                {/each}
+            
+        </div>
+    {/if}
 </section>

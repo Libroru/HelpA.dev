@@ -7,6 +7,6 @@
         FREE
     </div>
     <div>
-        BOOST
+        🚀 BOOST
     </div>
 </section>
