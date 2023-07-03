@@ -1,5 +1,5 @@
-<script>
-	import googleLogo from '$lib/images/google_logo.png'
+<script lang="ts">
+	import googleLogo from '$lib/images/google_logo.png';
 
 	import Question from '$lib/components/Question.svelte';
 
@@ -9,6 +9,8 @@
 	import 'firebase/auth';
 	import { onMount } from "svelte";
 	import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from "firebase/auth";
+
+	var app: any;
 
 	onMount(async () => {
 		const firebaseConfig = {
@@ -22,7 +24,7 @@
 		};
 
 		// Initialize Firebase
-		const app = initializeApp(firebaseConfig);
+		app = initializeApp(firebaseConfig);
 		const analytics = getAnalytics(app);
 	});
 </script>

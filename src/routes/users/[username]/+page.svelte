@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import { page } from '$app/stores';
     import { onMount } from 'svelte';
     import { initializeApp } from "firebase/app";
@@ -11,7 +11,9 @@
 
     var dataLoaded = false;
 
-    var friends = [];
+    var friends: any[] = [];
+
+    var joinDate: any;
 
     const firebaseConfig = {
 			apiKey: "AIzaSyChIG9JVOAY-ayR0zylRfARKbycrHCVmkk",
@@ -31,9 +33,10 @@
 
         querySnapshot.forEach(async (doc) => {
             userData = doc.data();
+            joinDate = new Date(userData.joinDate.seconds * 1000).toDateString()
             for (const friendRef of userData.friends) {
                 const friendDoc = await getDoc(friendRef);
-                const friendData = friendDoc.data();
+                const friendData: any = friendDoc.data();
                 friends = [...friends, friendData.userName]
                 console.log(friendData.userName);
                 console.log(friends);
@@ -45,13 +48,17 @@
 </script>
 
 <section>
-    <div>
+    <div class="card py-2 text-left">
         <span>{username}</span>
+        <span>Joined: {joinDate}</span>
     </div>
 
-    {#if dataLoaded}
-        {#each friends as friend}
-            <span>{friend}</span>
-        {/each}
-    {/if}
+    <div class="d-flex flex-column">
+        <span>Friends:</span>
+        {#if dataLoaded}
+            {#each friends as friend}
+                <a rel="external" href="/users/{friend}">{friend}</a>
+            {/each}
+        {/if}
+    </div>
 </section>

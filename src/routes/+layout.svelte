@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import '../app.scss';
 	import './styles.css';
 
@@ -9,8 +9,16 @@
 	import { onMount } from "svelte";
 	import { getAuth, onAuthStateChanged } from "firebase/auth";
 	import { goto } from '$app/navigation';
+	import { getFirestore, doc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
 
 	var userLoggedIn = false;
+	var showPopup = false;
+	var app: any;
+
+	var currentUsername: any;
+	
+	//TO DO: - currentUsername as button text
+	// 		 - popup at the right place -> fixed positioning
 
 	onMount(async () => {
 		const firebaseConfig = {
@@ -24,7 +32,7 @@
 		};
 
 		// Initialize Firebase
-		const app = initializeApp(firebaseConfig);
+		app = initializeApp(firebaseConfig);
 		const analytics = getAnalytics(app);
 
 		const auth = getAuth();
@@ -37,6 +45,28 @@
 		});
 	});
 
+	async function navigateToProfile() {
+		const db = getFirestore(app);
+		const auth = getAuth();
+		const userDocRef = doc(db, "users", String(auth.currentUser?.uid));
+		const userDocSnap = await getDoc(userDocRef);
+
+		if (userDocSnap.exists()) {
+			goto(`/users/${userDocSnap.data().userName}`);
+		}
+	}
+
+	async function getUserName() {
+		const db = getFirestore(app);
+		const auth = getAuth();
+		const userDocRef = doc(db, "users", String(auth.currentUser?.uid));
+		const userDocSnap = await getDoc(userDocRef);
+
+		if (userDocSnap.exists()) {
+			currentUsername = userDocSnap.data().userName
+		}
+	}
+
 </script>
 
 <div class="app">
@@ -48,7 +78,12 @@
 		</form>
 
 		{#if userLoggedIn}
-			<button class="btn btn-primary">My Profile</button>
+			<button class="btn btn-primary" on:click={() => {showPopup != showPopup}}>sa</button>
+			{#if showPopup}
+				<div class="card d-flex flex-column p-1">
+					<a on:click={async () => {await navigateToProfile()}} href="javascript:void(0)">My Profile</a>
+				</div>
+			{/if}
 		{:else}
 			<div class="d-inline-flex">
 				<button class="btn btn-primary mx-2" on:click={() => {goto("/signup")}}>Sign up</button>
