@@ -17,11 +17,17 @@
 	function navigateToPost() {
 		goto(`/posts/${postId}`)
 	}
+
+	function navigateToAuthor() {
+		goto(`/users/${author}`)
+	}
 </script>
 
 <div class="card p-4" style="width: 500px;" >
     <a href="javascript:void(0)" on:click={navigateToPost} on:keydown={navigateToPost} role="button" tabindex="0">{title}</a>
-	<p on:click={navigateToPost} on:keydown={navigateToPost} role="button" tabindex="0">{description}</p>
+	<div on:click={navigateToPost} on:keydown={navigateToPost} tabindex="-1" role="button">
+		<p>{description}</p>
+	</div>
 	<div class="d-flex flex-column" style="gap: 5px;">
 		<div class="d-inline-flex flex-row" style="gap: 0.25rem;">
 			<span>tags:</span>
@@ -31,8 +37,8 @@
 			{/each}
 		</div>
 		<div class="d-flex flex-row" style="gap: 0.25rem;">
-			<span on:click={navigateToPost} on:keydown={navigateToPost} role="button" tabindex="0">{author} | </span>
-			<span>{creationDate}</span>
+			<a href="javascript:void(0)" on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{author}</a>
+			<span> | {creationDate}</span>
 		</div>
 	</div>
 </div>

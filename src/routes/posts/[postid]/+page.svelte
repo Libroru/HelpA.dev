@@ -4,6 +4,8 @@
     import { initializeApp } from "firebase/app";
     import { getFirestore, doc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
 	import { goto } from '$app/navigation';
+
+    import { apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId, measurementId } from '$lib/api_keys.json';
     
     const postid = $page.params.postid;
 
@@ -14,14 +16,16 @@
     var authorData: any;
     var messages: any[] = [];
 
+    var commentContent: any;
+
     const firebaseConfig = {
-			apiKey: "AIzaSyChIG9JVOAY-ayR0zylRfARKbycrHCVmkk",
-			authDomain: "helpadev.firebaseapp.com",
-			projectId: "helpadev",
-			storageBucket: "helpadev.appspot.com",
-			messagingSenderId: "164373117763",
-			appId: "1:164373117763:web:6f3a45d2e2d89304b5cdf6",
-			measurementId: "G-RY0CH1Z9SQ"
+			apiKey: apiKey,
+			authDomain: authDomain,
+			projectId: projectId,
+			storageBucket: storageBucket,
+			messagingSenderId: messagingSenderId,
+			appId: appId,
+			measurementId: measurementId
     };
 
     onMount(async () => {
@@ -65,21 +69,34 @@
     function navigateToAuthor() {
         goto(`/users/${authorData.userName}`);
     }
+
+    function commentOnPost() {
+
+    }
 </script>
 
 <section>
     {#if dataLoaded}
-        <h1>{postData.title}</h1>
-        <div>
-            <a href="javascript:void(0)" on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{authorData.userName}</a>
-            <span>{new Date(postData.creationDate.seconds * 1000).toLocaleString()}</span>
+        <div class="card py-2 px-4" style="width: 48rem;">
+            <h1>{postData.title}</h1>
+            <p>{postData.question}</p>
+            <div>
+                <a href="javascript:void(0)" on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{authorData.userName}</a>
+                <span> - {new Date(postData.creationDate.seconds * 1000).toLocaleString()}</span>
+            </div>
         </div>
-        <p>{postData.question}</p>
-        <div>
+        <div class="card p-4">
             {#each messages as msg}
                 <span>{msg.messageText}</span>
-                <span>{msg.author}</span>
+                <div>
+                    <a href="javascript:void(0)" on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{msg.author}</a>
+                    <span> - {new Date(msg.creationDate.seconds * 1000).toLocaleString()}</span>
+                </div>
             {/each}
+        </div>
+        <div class="card p-4 d-flex flex-column">
+            <textarea name="Text1" cols="40" rows="5" bind:value={commentContent}></textarea>
+            <button class="btn btn-primary m-2" style="width: 8rem;" on:click={commentOnPost}>Comment</button>
         </div>
     {/if}
 </section>

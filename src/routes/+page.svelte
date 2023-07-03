@@ -9,20 +9,22 @@
 	import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from "firebase/auth";
 	import { getFirestore, collection, getDoc, getDocs, where, query, Timestamp } from 'firebase/firestore';
 
+	import { apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId, measurementId } from '$lib/api_keys.json';
+
 	var app: any;
 
 	var posts: any[] = [];
 
 	onMount(async () => {
 		const firebaseConfig = {
-			apiKey: "AIzaSyChIG9JVOAY-ayR0zylRfARKbycrHCVmkk",
-			authDomain: "helpadev.firebaseapp.com",
-			projectId: "helpadev",
-			storageBucket: "helpadev.appspot.com",
-			messagingSenderId: "164373117763",
-			appId: "1:164373117763:web:6f3a45d2e2d89304b5cdf6",
-			measurementId: "G-RY0CH1Z9SQ"
-		};
+			apiKey: apiKey,
+			authDomain: authDomain,
+			projectId: projectId,
+			storageBucket: storageBucket,
+			messagingSenderId: messagingSenderId,
+			appId: appId,
+			measurementId: measurementId
+    };
 
 		// Initialize Firebase
 		app = initializeApp(firebaseConfig);
@@ -40,6 +42,9 @@
 		querySnapshot.forEach(async (doc) => {
 			const postData = doc.data();
 			postData.uid = doc.id;
+			const authorRef = await getDoc(postData.author);
+			const authorData: any = authorRef.data();
+			postData.author = authorData.userName
 			posts = [...posts, postData];
 		});
 	}
@@ -53,6 +58,6 @@
 <section>
 	{#each posts as post}
 		<Question postId={post.uid} tags={["tags", "yourmom"]} title={post.title}
-			description={post.question} author="Libroru" creationDate={new Date(post.creationDate.seconds * 1000).toDateString()}/>
+			description={post.question} author={post.author} creationDate={new Date(post.creationDate.seconds * 1000).toDateString()}/>
 	{/each}
 </section>

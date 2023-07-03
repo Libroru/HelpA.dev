@@ -11,6 +11,8 @@
 	import { goto } from '$app/navigation';
 	import { getFirestore, doc, getDoc, getDocs, collection, query, where } from 'firebase/firestore';
 
+	import { apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId, measurementId } from '$lib/api_keys.json';
+
 	var userLoggedIn = false;
 	var showPopup = false;
 	var app: any;
@@ -22,14 +24,14 @@
 
 	onMount(async () => {
 		const firebaseConfig = {
-			apiKey: "AIzaSyChIG9JVOAY-ayR0zylRfARKbycrHCVmkk",
-			authDomain: "helpadev.firebaseapp.com",
-			projectId: "helpadev",
-			storageBucket: "helpadev.appspot.com",
-			messagingSenderId: "164373117763",
-			appId: "1:164373117763:web:6f3a45d2e2d89304b5cdf6",
-			measurementId: "G-RY0CH1Z9SQ"
-		};
+			apiKey: apiKey,
+			authDomain: authDomain,
+			projectId: projectId,
+			storageBucket: storageBucket,
+			messagingSenderId: messagingSenderId,
+			appId: appId,
+			measurementId: measurementId
+    };
 
 		// Initialize Firebase
 		app = initializeApp(firebaseConfig);
