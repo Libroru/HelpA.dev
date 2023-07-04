@@ -15,12 +15,13 @@
 
 	var userLoggedIn = false;
 	var showPopup = false;
+	
+	var db: any;
 	var app: any;
 
 	var currentUsername: any;
 	
-	//TO DO: - currentUsername as button text
-	// 		 - popup at the right place -> fixed positioning
+	//TO DO: - popup at the right place -> fixed positioning 
 
 	onMount(async () => {
 		const firebaseConfig = {
@@ -35,11 +36,14 @@
 
 		// Initialize Firebase
 		app = initializeApp(firebaseConfig);
+		db = getFirestore(app);
 		const analytics = getAnalytics(app);
 
 		const auth = getAuth();
-		onAuthStateChanged(auth, (user) => {
+
+		onAuthStateChanged(auth, async (user) => {
 			if (user) {
+				await getUserName();
 				userLoggedIn = true;
 			} else {
 				userLoggedIn = false;
@@ -48,9 +52,7 @@
 	});
 
 	async function navigateToProfile() {
-		const db = getFirestore(app);
-		const auth = getAuth();
-		const userDocRef = doc(db, "users", String(auth.currentUser?.uid));
+		const userDocRef = doc(db, "users", String(getAuth().currentUser?.uid));
 		const userDocSnap = await getDoc(userDocRef);
 
 		if (userDocSnap.exists()) {
@@ -58,14 +60,21 @@
 		}
 	}
 
+	async function logout() {
+		getAuth().signOut().then(function() {
+			showPopup = false;
+			goto("/");
+		}, function(error) {
+			console.log(error);
+		})
+	}
+
 	async function getUserName() {
-		const db = getFirestore(app);
-		const auth = getAuth();
-		const userDocRef = doc(db, "users", String(auth.currentUser?.uid));
+		const userDocRef = doc(db, "users", String(getAuth().currentUser?.uid));
 		const userDocSnap = await getDoc(userDocRef);
 
 		if (userDocSnap.exists()) {
-			currentUsername = userDocSnap.data().userName
+			currentUsername = userDocSnap.data().userName;
 		}
 	}
 
@@ -80,12 +89,7 @@
 		</form>
 
 		{#if userLoggedIn}
-			<button class="btn btn-primary" on:click={() => {showPopup != showPopup}}>sa</button>
-			{#if showPopup}
-				<div class="card d-flex flex-column p-1">
-					<a on:click={async () => {await navigateToProfile()}} href="javascript:void(0)">My Profile</a>
-				</div>
-			{/if}
+			<button class="btn btn-primary" on:click={() => {showPopup = !showPopup}}>{currentUsername}</button>
 		{:else}
 			<div class="d-inline-flex">
 				<button class="btn btn-primary mx-2" on:click={() => {goto("/signup")}}>Sign up</button>
@@ -93,6 +97,15 @@
 			</div>
 		{/if}
 	</nav>
+
+	<div class="p-2" style="position: absolute; top: 50px; right: 0;">
+		{#if showPopup}
+			<div class="card py-2" style="display: sticky; right: 0; width: 10rem; text-align: center; gap: 0.5rem;">
+				<a class="py-2" on:click={async () => {await navigateToProfile(); showPopup = !showPopup}} href="javascript:void(0)">My Profile</a>
+				<a class="py-2" on:click={async () => {await logout(); showPopup = !showPopup}} href="javascript:void(0)">Logout</a>
+			</div>
+		{/if}
+	</div>
 
 	<main class="d-flex flex-col justify-content-center align-items-center">
 		<slot />

@@ -50,8 +50,7 @@
             }).catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                const email = error.customData.email;
-                const credential = GoogleAuthProvider.credentialFromError(error);
+                console.log(errorMessage);
             });
     }
 
@@ -84,8 +83,6 @@
 				var displayName = auth.currentUser?.displayName.replace(/ /g,'').toLocaleLowerCase();
 				return displayName + Math.floor(Math.random() * 99);
 			}
-		} else {
-			//TO DO: Random Username if no Display Name is set
 		}
     }
 </script>

@@ -12,8 +12,10 @@
 	import { apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId, measurementId } from '$lib/api_keys.json';
 
 	var app: any;
+	var db: any;
 
 	var posts: any[] = [];
+	var postsRef: any;
 
 	onMount(async () => {
 		const firebaseConfig = {
@@ -34,19 +36,23 @@
 	});
 
 	async function getRecentQuestions() {
-		const db = getFirestore(app);
-		const messagesRef = collection(db, "posts");
+		db = getFirestore(app);
+		postsRef = collection(db, "posts");
 		const sevenDaysAgo = Timestamp.fromMillis(Date.now() - 604800000);
-		const querySnapshot = await getDocs(query(messagesRef, where("creationDate", ">=", sevenDaysAgo)));
+		const querySnapshot = await getDocs(query(postsRef, where("creationDate", ">=", sevenDaysAgo)));
 
 		querySnapshot.forEach(async (doc) => {
-			const postData = doc.data();
+			const postData: any = doc.data();
 			postData.uid = doc.id;
 			const authorRef = await getDoc(postData.author);
 			const authorData: any = authorRef.data();
 			postData.author = authorData.userName
 			posts = [...posts, postData];
 		});
+	}
+
+	async function createPost() {
+		
 	}
 </script>
 
@@ -56,8 +62,16 @@
 </svelte:head>
 
 <section>
-	{#each posts as post}
-		<Question postId={post.uid} tags={["tags", "yourmom"]} title={post.title}
-			description={post.question} author={post.author} creationDate={new Date(post.creationDate.seconds * 1000).toDateString()}/>
-	{/each}
+	<div class="d-flex flex-column" style="gap: 0.5rem;">
+		<div class="card">
+			<input type="text"/>
+			<textarea />
+			<input type="text"/>
+			<button class="btn btn-primary">Create Post</button>
+		</div>
+		{#each posts as post}
+			<Question postId={post.uid} tags={post.tags} title={post.title}
+				description={post.question} author={post.author} creationDate={new Date(post.creationDate.seconds * 1000).toDateString()}/>
+		{/each}
+	</div>
 </section>

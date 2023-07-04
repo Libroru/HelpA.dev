@@ -23,7 +23,7 @@
 	}
 </script>
 
-<div class="card p-4" style="width: 500px;" >
+<div class="card p-4" style="width: 48rem;" >
     <a href="javascript:void(0)" on:click={navigateToPost} on:keydown={navigateToPost} role="button" tabindex="0">{title}</a>
 	<div on:click={navigateToPost} on:keydown={navigateToPost} tabindex="-1" role="button">
 		<p>{description}</p>

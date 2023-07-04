@@ -41,8 +41,7 @@
             }).catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                const email = error.customData.email;
-                const credential = GoogleAuthProvider.credentialFromError(error);
+                console.log(errorMessage);
             });
         console.log(getAuth().currentUser)
     }
@@ -56,6 +55,7 @@
         .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
+            console.log(errorMessage);
         });
     }
 </script>
