@@ -1,50 +1,35 @@
 <script lang="ts">
     import googleLogo from '$lib/images/google_logo.png'
 
-    import { initializeApp } from "firebase/app";
-    import { getFirestore, doc, setDoc, Timestamp } from 'firebase/firestore';
+    import { doc, setDoc, Timestamp, getDoc } from 'firebase/firestore';
     import { goto } from '$app/navigation';
-	import { getAnalytics } from "firebase/analytics";
 	import 'firebase/auth';
-	import { onMount } from "svelte";
     import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword } from "firebase/auth";
+    import { db } from '$lib/firebase';
 
-    import { apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId, measurementId } from '$lib/api_keys.json';
+    import { userData } from '$lib/stores';
 
-    var passwordValue = ""
-    var emailValue = ""
-    var usernameValue = ""
+    var passwordValue: any;
+    var emailValue: any;
+    var usernameValue: any;
 
-    let app: any;
-
-    const firebaseConfig = {
-			apiKey: apiKey,
-			authDomain: authDomain,
-			projectId: projectId,
-			storageBucket: storageBucket,
-			messagingSenderId: messagingSenderId,
-			appId: appId,
-			measurementId: measurementId
-    };
-
-	onMount(async () => {
-		app = initializeApp(firebaseConfig);
-		const analytics = getAnalytics(app);
-	});
-
-    function loginWithGoogle() {
+    function singinWithGoogle() {
         const provider = new GoogleAuthProvider();
         const auth = getAuth();
-        const db = getFirestore(app);
         signInWithPopup(auth, provider)
             .then(async (result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (credential) {
-                    await setDoc(doc(db, 'users', String(result.user.uid)), {
-                        "userEmail": result.user.email,
-                        "userName": getDisplayName(),
-                        "joinDate": new Timestamp(Date.now() / 1000, Date.now())
+                    await setDoc(doc(db, 'users', String(getDisplayName()?.toLowerCase())), {
+                        "timestamp": Timestamp.fromMillis(Date.now()),
+                        "friends": [],
+                        "posts": [],
+                        "styling": getDisplayName()
                     });
+                    userData.set({
+                        uid: String(getDisplayName()).toLowerCase(),
+                        username: String(getDisplayName())
+                    })
                     goto("/");
                 }
             }).catch((error) => {
@@ -54,17 +39,30 @@
             });
     }
 
-    function loginWithPassword() {
+    async function signinWithPassword() {
         const auth = getAuth();
-        const db = getFirestore(app);
+        
+        const docRef = doc(db, "users", usernameValue.toLowerCase());
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            console.warn(`User with username ${usernameValue.toLowerCase()} already exists.`);
+            return;
+        }
+
         createUserWithEmailAndPassword(auth, emailValue, passwordValue)
         .then(async (result) => {
             if (result) {
-                await setDoc(doc(db, 'users', String(result.user.uid)), {
-                        "userEmail": result.user.email,
-                        "userName": usernameValue,
-                        "joinDate": new Timestamp(Date.now()/1000, (Date.now() % 1000) * 1000000)
-                    });
+                await setDoc(doc(db, 'users', usernameValue.toLowerCase()), {
+                    "timestamp": Timestamp.fromMillis(Date.now()),
+                    "friends": [],
+                    "posts": [],
+                    "styling": usernameValue
+                })
+                userData.set({
+                    uid: usernameValue.toLowerCase(),
+                    username: usernameValue
+                })
                 goto("/");
             }
         })
@@ -76,8 +74,7 @@
     }
 
     function getDisplayName() {
-        const auth = getAuth(app);
-		
+        const auth = getAuth();
 		if (auth.currentUser) {
 			if (auth.currentUser.displayName) {
 				var displayName = auth.currentUser?.displayName.replace(/ /g,'').toLocaleLowerCase();
@@ -103,10 +100,10 @@
                 <label for="passwordInput">Password</label>
                 <input type="password" id="passwordInput" class="form-control" bind:value={passwordValue} placeholder="Password">
             </div>
-            <button type="submit" class="btn btn-primary w-100 my-3" on:click={loginWithPassword}>Sign up</button>
+            <button type="submit" class="btn btn-primary w-100 my-3" on:click={signinWithPassword}>Sign up</button>
         </form>
         <span class="text-center">- OR -</span>
-        <button class="btn btn-light border-black w-100 mt-4 d-flex-inline flex-row" on:click={loginWithGoogle}>
+        <button class="btn btn-light border-black w-100 mt-4 d-flex-inline flex-row" on:click={singinWithGoogle}>
             <img src={googleLogo} alt="Google Logo" class="mx-1" style="width: 1.5rem;"/>
             Sign up with Google
         </button>

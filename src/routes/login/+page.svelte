@@ -1,42 +1,33 @@
-<script>
+<script lang="ts">
     import googleLogo from '$lib/images/google_logo.png'
+    import { db } from "$lib/firebase";
 
-    import { initializeApp } from "firebase/app";
-	import { getAnalytics } from "firebase/analytics";
 	import 'firebase/auth';
-	import { onMount } from "svelte";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from "firebase/auth";
 	import { goto } from '$app/navigation';
+	import { doc, getDoc } from 'firebase/firestore';
 
-    import { apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId, measurementId } from '$lib/api_keys.json';
+    import { userData } from '$lib/stores';
 
-    var passwordValue = ""
-    var emailValue = ""
-
-	onMount(async () => {
-		const firebaseConfig = {
-			apiKey: apiKey,
-			authDomain: authDomain,
-			projectId: projectId,
-			storageBucket: storageBucket,
-			messagingSenderId: messagingSenderId,
-			appId: appId,
-			measurementId: measurementId
-        };
-
-		// Initialize Firebase
-		const app = initializeApp(firebaseConfig);
-		const analytics = getAnalytics(app);
-	});
+    var passwordValue: any;
+    var emailValue: any;
 
     function loginWithGoogle() {
         const provider = new GoogleAuthProvider();
         const auth = getAuth();
         signInWithPopup(auth, provider)
-            .then((result) => {
+            .then(async (result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (credential) {
-                    goto("/")
+                    const userRef = await getDoc(doc(db, "users", String(getAuth().currentUser?.uid)));
+                    const userSnapshot = userRef.data();
+                    if (userSnapshot) {
+                        userData.set({
+                            uid: String(getAuth().currentUser?.uid),
+                            username: userSnapshot.username
+                        })
+                    }
+                    goto("/");
                 }
             }).catch((error) => {
                 const errorCode = error.code;
@@ -49,8 +40,16 @@
     function loginWithPassword() {
         const auth = getAuth();
         signInWithEmailAndPassword(auth, emailValue, passwordValue)
-        .then(() => {
-            goto("/")
+        .then(async () => {
+            const userRef = await getDoc(doc(db, "users", String(getAuth().currentUser?.uid)));
+            const userSnapshot = userRef.data();
+            if (userSnapshot) {
+                userData.set({
+                    uid: String(getAuth().currentUser?.uid),
+                    username: userSnapshot.username
+                })
+            }   
+            goto("/");
         })
         .catch((error) => {
             const errorCode = error.code;
