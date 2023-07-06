@@ -5,7 +5,7 @@
 	import 'firebase/auth';
     import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword } from "firebase/auth";
 	import { goto } from '$app/navigation';
-	import { doc, getDoc } from 'firebase/firestore';
+	import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 
     import { userData } from '$lib/stores';
 
@@ -15,41 +15,42 @@
     function loginWithGoogle() {
         const provider = new GoogleAuthProvider();
         const auth = getAuth();
+
+        const userCollection = collection(db, "users");
+
         signInWithPopup(auth, provider)
             .then(async (result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (credential) {
-                    const userRef = await getDoc(doc(db, "users", String(getAuth().currentUser?.uid)));
-                    const userSnapshot = userRef.data();
-                    if (userSnapshot) {
-                        userData.set({
-                            uid: String(getAuth().currentUser?.uid),
-                            username: userSnapshot.username
-                        })
-                    }
-                    goto("/");
+                    const q = query(userCollection, where("email", "==", auth.currentUser?.email));
+                    const querySnapshot = await getDocs(q);
+                    querySnapshot.forEach((doc) => {
+                        userData.set({uid: doc.id})
+                    })
+                    //goto("/");
                 }
             }).catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.log(errorMessage);
             });
+        console.log("currUser")
         console.log(getAuth().currentUser)
     }
 
     function loginWithPassword() {
         const auth = getAuth();
+
+        const userCollection = collection(db, "users");
+
         signInWithEmailAndPassword(auth, emailValue, passwordValue)
         .then(async () => {
-            const userRef = await getDoc(doc(db, "users", String(getAuth().currentUser?.uid)));
-            const userSnapshot = userRef.data();
-            if (userSnapshot) {
-                userData.set({
-                    uid: String(getAuth().currentUser?.uid),
-                    username: userSnapshot.username
-                })
-            }   
-            goto("/");
+            const q = query(userCollection, where("email", "==", auth.currentUser?.email));
+            const querySnapshot = await getDocs(q);
+            querySnapshot.forEach((doc) => {
+                userData.set({uid: doc.id})
+            })
+            //goto("/");
         })
         .catch((error) => {
             const errorCode = error.code;

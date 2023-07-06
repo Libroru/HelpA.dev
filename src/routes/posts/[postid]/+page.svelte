@@ -1,12 +1,13 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { onDestroy, onMount } from 'svelte';
-    import { initializeApp, type FirebaseApp } from "firebase/app";
-    import { getFirestore, doc, getDoc, Timestamp, updateDoc, onSnapshot, Firestore, arrayUnion, arrayRemove } from 'firebase/firestore';
+    import { doc, getDoc, Timestamp, updateDoc, onSnapshot, Firestore, arrayUnion } from 'firebase/firestore';
+    import { db } from '$lib/firebase';
+
+    import { get } from 'svelte/store';
+    import { userData } from '$lib/stores';
 
     import Answer from '$lib/components/Answer.svelte';
-
-    import { apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId, measurementId } from '$lib/api_keys.json';
     
     class PostModel {
         author: any;
@@ -30,8 +31,6 @@
 
     const postid = $page.params.postid;
 
-    var app: FirebaseApp;
-    var db: Firestore;
     var postReference: any;
 
     var dataLoaded: Boolean = false;
@@ -42,19 +41,13 @@
 
     var commentContent: any;
 
-    const firebaseConfig = {
-			apiKey: apiKey,
-			authDomain: authDomain,
-			projectId: projectId,
-			storageBucket: storageBucket,
-			messagingSenderId: messagingSenderId,
-			appId: appId,
-			measurementId: measurementId
-    };
+    var user: any;
+
+	userData.subscribe(fetchedUserData => {
+		user = fetchedUserData;
+	});
 
     onMount(async () => {
-        app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
         unsubscribe = onSnapshot(doc(db, "posts", postid), async (docSnapshot) => {
             if (docSnapshot.exists()) {
                 postReference = docSnapshot;
@@ -71,16 +64,11 @@
         }
     });
 
-    async function getAuthor(postInfo: any) {
-        const authorSnapshot: any = await getDoc(postInfo);
-        return authorSnapshot.data().username;
-    }
-
     async function commentOnPost() {
         const postRef = doc(db, "posts", postid);
         await updateDoc(postRef,{
             comments: arrayUnion({
-                author: localStorage.getItem("userUsername"),
+                author: user.uid,
                 content: commentContent,
                 solved: false,
                 timestamp: Timestamp.fromMillis(Date.now())
@@ -107,7 +95,7 @@
             <div class="d-flex flex-column my-2" style="gap: 0.5rem;">
                 {#if dataLoaded}
                     {#each thisPost.comments as comment, index}
-                        <Answer postAuthor={thisPost.author} messageArray={thisPost.comments} postReference={postReference} index={index} db={db} currentUserName={localStorage.getItem("userUsername")} author={comment.author}
+                        <Answer postAuthor={thisPost.author} messageArray={thisPost.comments} postReference={postReference} index={index} author={comment.author}
                             content={comment.content} timestamp={comment.timestamp.seconds} solved={comment.solved}/>
                     {/each}
                 {/if}

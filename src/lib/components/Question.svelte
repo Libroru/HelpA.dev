@@ -24,7 +24,7 @@
 </script>
 
 <div class="card p-4" style="width: 48rem;" >
-    <a href="javascript:void(0)" on:click={navigateToPost} on:keydown={navigateToPost} role="button" tabindex="0">{title}</a>
+    <a href={`/posts/${postId}`} on:click={navigateToPost} on:keydown={navigateToPost} role="button" tabindex="0">{title}</a>
 	<div on:click={navigateToPost} on:keydown={navigateToPost} tabindex="-1" role="button">
 		<p>{description}</p>
 	</div>
@@ -36,7 +36,7 @@
 					on:click={navigateToTag} on:keydown={navigateToTag} role="button" tabindex="0">{tag}</span>
 			{/each}
 			<div class="d-flex flex-row" style="gap: 0.25rem; margin-left: auto;">
-				<a href="javascript:void(0)" on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{author}</a>
+				<a href={`/users/${author}`} on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{author}</a>
 				<span> - {creationDate}</span>
 			</div>
 		</div>

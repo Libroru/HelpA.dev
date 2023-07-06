@@ -5,12 +5,8 @@
 	import { onMount } from "svelte";
 	import { getAuth, onAuthStateChanged } from "firebase/auth";
 	import { goto } from '$app/navigation';
-	import { doc, getDoc } from 'firebase/firestore';
 
-	import { get } from 'svelte/store';
 	import { userData } from '$lib/stores';
-
-	import { db } from '$lib/firebase';
 
 	var userLoggedIn = false;
 	var showPopup = false;
@@ -21,8 +17,6 @@
 		user = fetchedUserData;
 	});
 
-
-
 	onMount(async () => {
 		onAuthStateChanged(getAuth(), async (user) => {
 			userLoggedIn = user ? true : false;
@@ -32,8 +26,7 @@
 	async function logout() {
 		getAuth().signOut().then(function() {
 			showPopup = false;
-			localStorage.removeItem("userUid");
-			localStorage.removeItem("userUsername");
+			userData.set({uid: "null"})
 			goto("/");
 		}, function(error) {
 			console.log(error);
@@ -51,7 +44,7 @@
 		</form>
 
 		{#if userLoggedIn}
-			<button class="btn btn-primary" on:click={() => {showPopup = !showPopup}}>{user.username}</button>
+			<button class="btn btn-primary" on:click={() => {showPopup = !showPopup}}>{user.uid}</button>
 		{:else}
 			<div class="d-inline-flex">
 				<button class="btn btn-primary mx-2" on:click={() => {goto("/signup")}}>Sign up</button>
@@ -63,7 +56,7 @@
 	<div class="p-2" style="position: absolute; top: 50px; right: 0;">
 		{#if showPopup}
 			<div class="card py-2" style="display: sticky; right: 0; width: 10rem; text-align: center; gap: 0.5rem;">
-				<a class="py-2" href={`/users/${user.username}`}>My Profile</a>
+				<a on:click={() => {showPopup = !showPopup}} class="py-2" href={`/users/${user.uid}`}>My Profile</a>
 				<a class="py-2" on:click={async () => {await logout(); showPopup = !showPopup}} href="/">Logout</a>
 			</div>
 		{/if}

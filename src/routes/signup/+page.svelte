@@ -20,15 +20,15 @@
             .then(async (result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (credential) {
-                    await setDoc(doc(db, 'users', String(getDisplayName()?.toLowerCase())), {
+                    const displayName = getDisplayName();
+                    await setDoc(doc(db, 'users', String(displayName).toLowerCase()), {
                         "timestamp": Timestamp.fromMillis(Date.now()),
+                        "email": auth.currentUser?.email,
                         "friends": [],
-                        "posts": [],
-                        "styling": getDisplayName()
+                        "posts": []
                     });
                     userData.set({
-                        uid: String(getDisplayName()).toLowerCase(),
-                        username: String(getDisplayName())
+                        uid: String(displayName).toLowerCase()
                     })
                     goto("/");
                 }
@@ -55,13 +55,12 @@
             if (result) {
                 await setDoc(doc(db, 'users', usernameValue.toLowerCase()), {
                     "timestamp": Timestamp.fromMillis(Date.now()),
+                    "email": auth.currentUser?.email,
                     "friends": [],
-                    "posts": [],
-                    "styling": usernameValue
+                    "posts": []
                 })
                 userData.set({
-                    uid: usernameValue.toLowerCase(),
-                    username: usernameValue
+                    uid: usernameValue.toLowerCase()
                 })
                 goto("/");
             }
