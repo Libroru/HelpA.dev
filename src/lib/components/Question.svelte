@@ -1,0 +1,44 @@
+<script lang="ts">
+	import { goto } from "$app/navigation";
+
+	export let tags: any[] = [];
+	export let title: any;
+	export let description: any;
+	export let author: any;
+	export let creationDate: any;
+
+	export let postId: any;
+
+    function navigateToTag(event: any) {
+		const tag = event.target.innerText;
+    	goto(`/tags/${tag}`);
+	}
+
+	function navigateToPost() {
+		goto(`/posts/${postId}`)
+	}
+
+	function navigateToAuthor() {
+		goto(`/users/${author}`)
+	}
+</script>
+
+<div class="card p-4" style="width: 48rem;" >
+    <a href="javascript:void(0)" on:click={navigateToPost} on:keydown={navigateToPost} role="button" tabindex="0">{title}</a>
+	<div on:click={navigateToPost} on:keydown={navigateToPost} tabindex="-1" role="button">
+		<p>{description}</p>
+	</div>
+	<div class="d-flex flex-column" style="gap: 4px;">
+		<div class="d-inline-flex flex-row" style="gap: 0.25rem;">
+			<span>tags:</span>
+			{#each tags as tag}
+				<span class="card px-1 bg-info text-white" style="width: fit-content;"
+					on:click={navigateToTag} on:keydown={navigateToTag} role="button" tabindex="0">{tag}</span>
+			{/each}
+			<div class="d-flex flex-row" style="gap: 0.25rem; margin-left: auto;">
+				<a href="javascript:void(0)" on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{author}</a>
+				<span> - {creationDate}</span>
+			</div>
+		</div>
+	</div>
+</div>
