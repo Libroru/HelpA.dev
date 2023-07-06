@@ -28,17 +28,17 @@
 	<div on:click={navigateToPost} on:keydown={navigateToPost} tabindex="-1" role="button">
 		<p>{description}</p>
 	</div>
-	<div class="d-flex flex-column" style="gap: 5px;">
+	<div class="d-flex flex-column" style="gap: 4px;">
 		<div class="d-inline-flex flex-row" style="gap: 0.25rem;">
 			<span>tags:</span>
 			{#each tags as tag}
 				<span class="card px-1 bg-info text-white" style="width: fit-content;"
 					on:click={navigateToTag} on:keydown={navigateToTag} role="button" tabindex="0">{tag}</span>
 			{/each}
-		</div>
-		<div class="d-flex flex-row" style="gap: 0.25rem;">
-			<a href="javascript:void(0)" on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{author}</a>
-			<span> | {creationDate}</span>
+			<div class="d-flex flex-row" style="gap: 0.25rem; margin-left: auto;">
+				<a href="javascript:void(0)" on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{author}</a>
+				<span> - {creationDate}</span>
+			</div>
 		</div>
 	</div>
 </div>

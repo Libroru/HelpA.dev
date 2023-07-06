@@ -1,32 +1,46 @@
 <script lang="ts">
     import { page } from '$app/stores';
-    import { onMount } from 'svelte';
-    import { initializeApp } from "firebase/app";
-    import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, addDoc, Timestamp, updateDoc } from 'firebase/firestore';
-	import { goto } from '$app/navigation';
+    import { onDestroy, onMount } from 'svelte';
+    import { initializeApp, type FirebaseApp } from "firebase/app";
+    import { getFirestore, doc, getDoc, Timestamp, updateDoc, onSnapshot, Firestore, arrayUnion, arrayRemove } from 'firebase/firestore';
 
     import Answer from '$lib/components/Answer.svelte';
 
     import { apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId, measurementId } from '$lib/api_keys.json';
-	import { getAuth, onAuthStateChanged } from 'firebase/auth';
     
+    class PostModel {
+        author: any;
+        timestamp: Timestamp;
+        title: String;
+        content: String;
+        solved: Boolean;
+        tags: any[];
+        comments: any[];
+        
+        constructor(author: any, timestamp: Timestamp, title: String, content: String, solved: Boolean, tags: any[], comments: any[]) {
+            this.author = author;
+            this.timestamp = timestamp;
+            this.title = title;
+            this.content = content;
+            this.solved = solved;
+            this.tags = tags;
+            this.comments = comments;
+        }
+    }
+
     const postid = $page.params.postid;
 
-    var app: any;
-    var db: any;
-    var dataLoaded: any = false;
+    var app: FirebaseApp;
+    var db: Firestore;
+    var postReference: any;
 
-    var postData: any;
-    var authorData: any;
-    var messages: any[] = [];
+    var dataLoaded: Boolean = false;
 
-    var currentUserName: any;
+    var thisPost: PostModel;
 
-    var postBelongsToUser: any;
+    let unsubscribe: any;
 
     var commentContent: any;
-
-    var solvedMessage: any;
 
     const firebaseConfig = {
 			apiKey: apiKey,
@@ -41,104 +55,62 @@
     onMount(async () => {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
-        await getPostData();
+        unsubscribe = onSnapshot(doc(db, "posts", postid), async (docSnapshot) => {
+            if (docSnapshot.exists()) {
+                postReference = docSnapshot;
+                const data = docSnapshot.data()
+                thisPost = new PostModel(data.author, data.timestamp, data.title, data.content, data.solved, data.tags, data.comments);
+            }
+        });
         dataLoaded = true;
     });
 
-    async function getPostData() {
-        const docRef = doc(db, "posts", postid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            const docData = docSnap.data();
-            postData = docData;
-            await getAuthorData(postData.author);
-            await getMessages(docData);
-            currentUserName = await getCurrentUser();
-        } else {
-            //TO DO: Add Error Handling
+    onDestroy(async () => {
+        if (typeof unsubscribe === 'function') {
+            unsubscribe();
         }
-    }
+    });
 
-    async function getAuthorData(authorRef: any) {
-        const authorTempData = await getDoc(authorRef);
-        const authorId = authorTempData.id
-        authorData = authorTempData.data();
-    }
-
-    async function getMessages(docData: any) {
-        docData.answers.forEach(async (doc: any) => {
-            const message = await getDoc(doc);
-            var messageData: any = message.data();
-            if (messageData) {
-                const messageAuthorSnap = await getDoc(messageData.author);
-                const messageAuthorData: any = messageAuthorSnap.data();
-                messageData.author = messageAuthorData.userName;
-                messageData.uid = message.id;
-                messageData.solved = message.id == postData.solved.uid ? true : false; //Doesn't work -> fix.
-                messages = [...messages, messageData];
-            }
-        });
-    }
-
-    function navigateToAuthor() {
-        goto(`/users/${authorData.userName}`);
+    async function getAuthor(postInfo: any) {
+        const authorSnapshot: any = await getDoc(postInfo);
+        return authorSnapshot.data().username;
     }
 
     async function commentOnPost() {
-        const docRef = await addDoc(collection(db, "messages"), {
-            creationDate: Timestamp.fromMillis(Date.now()),
-            messageText: commentContent,
-            author: doc(db, "users", String(getAuth().currentUser?.uid))
+        const postRef = doc(db, "posts", postid);
+        await updateDoc(postRef,{
+            comments: arrayUnion({
+                author: localStorage.getItem("userUsername"),
+                content: commentContent,
+                solved: false,
+                timestamp: Timestamp.fromMillis(Date.now())
+            })
         });
 
-        const postRef = doc(db, "posts", postid);
-        const postSnap = await getDoc(postRef);
-
-        console.log(doc(db, "users", String(getAuth().currentUser?.uid)));
-
-        if (postSnap.exists()) {
-            var earlierMessages = postSnap.data().answers;
-            earlierMessages = [...earlierMessages, docRef];
-
-            await updateDoc(doc(db, "posts", postid), {
-                answers: earlierMessages,
-            });
-
-
-        }
-    }
-
-    async function getCurrentUser() {
-        const userRef = doc(db, "users", String(getAuth().currentUser?.uid));
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-            return userSnap.data().userName;
-        }
-    }
-
-    async function solvedPressed() {
-        
+        commentContent = "";
     }
 </script>
 
 <section>
-    {#if dataLoaded}
+    {#if thisPost != null}
         <div class="d-flex flex-column" style="gap: 0.5rem;">
-            <div class="card py-4 px-4" style="width: 48rem;">
-                <h1>{postData.title}</h1>
-                <p>{postData.question}</p>
-                <div>
-                    <a href="javascript:void(0)" on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{authorData.userName}</a>
-                    <span> - {new Date(postData.creationDate.seconds * 1000).toLocaleString()}</span>
-                </div>
+            <div class="card py-2 px-4" style="width: 48rem;">
+                <h1>{thisPost.title}</h1>
+                <p style="white-space: pre-line">{thisPost.content}</p>
+                {#if dataLoaded}
+                    <div style="margin-left: auto;">
+                        <a href={`/users/${thisPost.author}`}>{thisPost.author}</a>
+                        <span> - {new Date(thisPost.timestamp.seconds * 1000).toLocaleString()}</span>
+                    </div>
+                {/if}
             </div>
             <div class="d-flex flex-column my-2" style="gap: 0.5rem;">
-                {#each messages as msg}
-                    <Answer db={db} messageId={msg.uid} postId={postid} solved={msg.solved} currentUserName={currentUserName} messageAuthor={msg.author} messageText={msg.messageText}
-                        creationDate={msg.creationDate} on:click={solvedPressed} on:keydown={solvedPressed}/>  
-                {/each}
+                {#if dataLoaded}
+                    {#each thisPost.comments as comment, index}
+                        <Answer postAuthor={thisPost.author} messageArray={thisPost.comments} postReference={postReference} index={index} db={db} currentUserName={localStorage.getItem("userUsername")} author={comment.author}
+                            content={comment.content} timestamp={comment.timestamp.seconds} solved={comment.solved}/>
+                    {/each}
+                {/if}
             </div>
             <div class="card p-4 d-flex flex-column align-items-center">
                 <textarea name="Text1" cols="40" rows="5" bind:value={commentContent} style="width: 100%;"></textarea>

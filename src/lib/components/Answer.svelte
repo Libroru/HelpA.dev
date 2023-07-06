@@ -1,46 +1,67 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-	import { doc, getDoc, setDoc, collection, updateDoc } from "firebase/firestore";
+	import { updateDoc } from "firebase/firestore";
+	import { onMount } from "svelte";
 
-    export var messageText: any;
-    export var creationDate: any;
+    export var index: any;
+    export var postReference: any;
+
+    export var messageArray: any;
+
+    export var content: any;
+    export var timestamp: any;
     export var solved: any;
 
-    export var messageAuthor: any;
+    export var author: any;
     export var currentUserName: any;
+    export var postAuthor: any;
 
-    export var postId: any;
-    export var messageId: any;
+    $: shadow = solved ? "0px 0px 10px yellow" : "";
 
-    export var db: any;
-
-    function navigateToAuthor() {
-        goto(`/users/${currentUserName}`);
+    async function deletePost() {
+        if (author == currentUserName) {
+            messageArray.splice(index, 1);
+            await updateDoc(postReference.ref, {
+                comments: messageArray
+            });
+        }
     }
 
     async function markAsSolved() {
-        const postRef = doc(db, "posts", postId);
+        if (postAuthor == currentUserName) {
+            let postIsSolved = messageArray.some((item: { solved: boolean; }) => item.solved === true);
+            let thisMessageIsSolved = messageArray[index].solved
 
-        await updateDoc(postRef, {
-            solved: doc(db, "messages", messageId),
-        });
+            if (!postIsSolved && !thisMessageIsSolved) {
+                messageArray[index].solved = !messageArray[index].solved;
+            } else if (postIsSolved && thisMessageIsSolved) {
+                messageArray[index].solved = !messageArray[index].solved;
+            }
+
+            await updateDoc(postReference.ref, {
+                comments: messageArray
+            });
+        }
     }
 </script>
 
-
-<div class="card p-4 d-flex flex-column">
-    <div class="flex flex-column">
-        <span class="mb-3">{messageText}</span>
-        <div>
-            <a href="javascript:void(0)" on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{messageAuthor}</a>
-            <span> - {new Date(creationDate.seconds * 1000).toLocaleString()}</span>
+<div class="card px-4 py-2 d-flex flex-column" style:box-shadow={shadow}>
+    <div class="w-100 position-relative" style="height: 1.5rem;">
+        {#if author == currentUserName}
+            <span class="position-absolute" style="cursor:pointer; right: 0;" on:click={deletePost} on:keydown={deletePost} role="button" tabindex="0">X</span>
+        {/if}
+    </div>
+    <div class="d-flex flex-column" style="gap: 4px;">
+        <p class="mb-3" style="white-space: pre-line;">{content}</p>
+        <div class="d-flex flex-column">
+            <div class="d-inline-flex flex-row">
+                {#if postAuthor == currentUserName}
+                    <span style="cursor: pointer; color: #ff3e00; text-decoration: underline" on:click={markAsSolved} on:keydown={markAsSolved} role="button" tabindex="0">Mark as solved</span>
+                {/if}
+                <div style="margin-left: auto;">
+                    <a href={`/users/${author}`}>{author}</a>
+                    <span> - {new Date(timestamp * 1000).toLocaleString()}</span>
+                </div>
+            </div>
         </div>
     </div>
-    {#if !solved}
-        {#if messageAuthor == currentUserName}
-            <span class="mt-4 text-decoration-underline" style="color: blue;t"
-                role="button" tabindex="0" on:click={async () => {await markAsSolved()}} on:keydown={async () => {await markAsSolved()}}>Mark as solved</span>
-        {/if}
-    {/if}
 </div>
-
