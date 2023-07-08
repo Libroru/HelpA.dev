@@ -57,13 +57,12 @@
     }
 
     async function editComment() {
-        editing = !editing;
+        if (user.uid == author) editing = !editing;
+        else return;
 
         oldText = oldText == null ? oldText = content : oldText = oldText;
 
         if (oldText != content) {
-            console.log("Difference detected when editing comment");
-
             messageArray[index].content = content;
             await updateDoc(doc(db, 'posts', postReference.ref.id), {
                 comments: messageArray
@@ -74,7 +73,7 @@
     }
 </script>
 
-<div class="card px-4 py-2 d-flex flex-column" style:box-shadow={shadow}>
+<div class="card px-4 py-2 d-flex flex-column" style="width: 48rem;" style:box-shadow={shadow}>
     <div class="w-100 position-relative" style="height: 1.5rem;">
         {#if author == user.uid}
             <button class="position-absolute text-button" style="right: 0;" on:click={deleteComment}>X</button>
@@ -82,9 +81,10 @@
     </div>
     <div class="d-flex flex-column" style="gap: 4px;">
         {#if editing}
-            <textarea class="mb-3" style="white-space: pre-line;" bind:value={content}></textarea>
+            <textarea class="mb-2" style="white-space: pre-line; max-height: 300px;" bind:value={content}></textarea>
+            <button class="btn btn-primary mr-2 mb-2" style="width: fit-content; margin-left: auto;" on:click={() => {editing = !editing}}>Finished</button>
         {:else}
-            <p class="mb-3" style="white-space: pre-line;">{content}</p>
+            <p class="mb-3" style="white-space: pre-line; max-width: 100%; padding-right: 1rem;">{content}</p>
         {/if}
         <div class="d-flex flex-column">
             <div class="d-inline-flex flex-row">
@@ -92,8 +92,10 @@
                     <button class="text-button svelte-underlined-text" on:click={markAsSolved}>Mark as solved</button>
                 {/if}
                 <div style="margin-left: auto;">
+                    {#if user.uid == author}
                     <button class="text-button svelte-underlined-text" on:click={async () => {await editComment()}}>Edit Comment</button>
                      - 
+                    {/if}
                     <a href={`/users/${author}`}>{author}</a>
                      - 
                     <span>{new Date(timestamp * 1000).toLocaleString()}</span>

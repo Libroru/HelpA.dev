@@ -30,7 +30,6 @@
 	</div>
 	<div class="d-flex flex-column" style="gap: 4px;">
 		<div class="d-inline-flex flex-row" style="gap: 0.25rem;">
-			<span>tags:</span>
 			{#each tags as tag}
 				<span class="card px-1 bg-info text-white" style="width: fit-content;"
 					on:click={navigateToTag} on:keydown={navigateToTag} role="button" tabindex="0">{tag}</span>

@@ -64,8 +64,9 @@
 </svelte:head>
 
 <section>
-	<div class="d-flex flex-column" style="gap: 0.5rem;">
-		<div class="card">
+	<div class="d-flex flex-column">
+		<div class="card p-4 d-flex flex-column gap-2">
+			<h1 style="margin-right: auto;">Create a post</h1>
 			<input type="text" placeholder="How to center a div" bind:value={postTitleInput}/>
 			<textarea placeholder="Hey guys! I just wanted to ask how to center a div in CSS?" bind:value={postContentInput}/>
 			<input type="text" placeholder="html, css" bind:value={postTagsInput}/>
