@@ -41,6 +41,10 @@
 
     var commentContent: any;
 
+    var editing: Boolean = false;
+    var oldText: String;
+    var oldTitle: String;
+
     var user: any;
 
 	userData.subscribe(fetchedUserData => {
@@ -77,18 +81,44 @@
 
         commentContent = "";
     }
+
+    async function editPost() {
+        editing = !editing;
+
+        oldText = oldText == null ? oldText = thisPost.content : oldText = oldText;
+        oldTitle = oldTitle == null ? oldTitle = thisPost.title : oldTitle = oldTitle;
+
+        if (oldText != thisPost.content || oldTitle != thisPost.title) {
+            console.log("Difference in data noticed when editing post!")
+            await updateDoc(doc(db, 'posts', postid), {
+                content: thisPost.content,
+                title: thisPost.title
+            });
+        }
+
+        oldText = thisPost.content;
+    }
 </script>
 
 <section>
     {#if thisPost != null}
         <div class="d-flex flex-column" style="gap: 0.5rem;">
             <div class="card py-2 px-4" style="width: 48rem;">
-                <h1>{thisPost.title}</h1>
-                <p style="white-space: pre-line">{thisPost.content}</p>
                 {#if dataLoaded}
+                    {#if editing}
+                        <input class="text-center" bind:value="{thisPost.title}">
+                        <textarea bind:value={thisPost.content}></textarea>
+                        <button class="btn btn-primary mt-2 mr-2 mb-2" style="width: fit-content; margin-left: auto;" on:click={async () => {await editPost()}}>Finished</button>
+                    {:else}
+                        <h1>{thisPost.title}</h1>
+                        <p style="white-space: pre-line">{thisPost.content}</p>
+                    {/if}
                     <div style="margin-left: auto;">
+                        <button class="text-button svelte-underlined-text" on:click={async () => {await editPost()}}>Edit Post</button>
+                         - 
                         <a href={`/users/${thisPost.author}`}>{thisPost.author}</a>
-                        <span> - {new Date(thisPost.timestamp.seconds * 1000).toLocaleString()}</span>
+                         - 
+                        <span>{new Date(thisPost.timestamp.seconds * 1000).toLocaleString()}</span>
                     </div>
                 {/if}
             </div>
@@ -107,3 +137,18 @@
         </div>
     {/if}
 </section>
+
+<style>
+    .text-button {
+        background:none;
+        border:none;
+        margin:0;
+        padding:0;
+        cursor: pointer;
+    }
+
+    .svelte-underlined-text {
+        color: #ff3e00;
+        text-decoration: underline
+    }
+</style>

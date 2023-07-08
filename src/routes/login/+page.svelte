@@ -27,7 +27,7 @@
                     querySnapshot.forEach((doc) => {
                         userData.set({uid: doc.id})
                     })
-                    //goto("/");
+                    goto("/");
                 }
             }).catch((error) => {
                 const errorCode = error.code;
@@ -50,7 +50,7 @@
             querySnapshot.forEach((doc) => {
                 userData.set({uid: doc.id})
             })
-            //goto("/");
+            goto("/");
         })
         .catch((error) => {
             const errorCode = error.code;
