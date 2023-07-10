@@ -1,5 +1,5 @@
 /* Write your global styles here, in SCSS syntax. Variables and mixins from the src/variables.scss file are available here without importing */ /* Import only what you need from Bootstrap */
-@import 'bootstrap/scss/root';
+/*@import 'bootstrap/scss/root';
 @import 'bootstrap/scss/reboot';
 @import 'bootstrap/scss/type';
 @import 'bootstrap/scss/images';
@@ -31,4 +31,8 @@
 @import 'bootstrap/scss/offcanvas';
 @import 'bootstrap/scss/placeholders';
 @import 'bootstrap/scss/helpers';
-@import 'bootstrap/scss/utilities/api';
+@import 'bootstrap/scss/utilities/api';*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

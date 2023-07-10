@@ -12,41 +12,51 @@
     var passwordValue: any;
     var emailValue: any;
     var usernameValue: any;
+    var errorText: String;
 
     function singinWithGoogle() {
+        if (usernameValue == null || usernameValue == "") {
+            errorText = "Firebase: Error (auth/username-cannot-be-empty).";
+            return;
+        }
+
         const provider = new GoogleAuthProvider();
         const auth = getAuth();
         signInWithPopup(auth, provider)
             .then(async (result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (credential) {
-                    await setDoc(doc(db, 'users', String(getDisplayName()?.toLowerCase())), {
+                    await setDoc(doc(db, 'users', usernameValue.toLowerCase()), {
                         "timestamp": Timestamp.fromMillis(Date.now()),
+                        "email": auth.currentUser?.email,
                         "friends": [],
-                        "posts": [],
-                        "styling": getDisplayName()
+                        "posts": []
                     });
                     userData.set({
-                        uid: String(getDisplayName()).toLowerCase(),
-                        username: String(getDisplayName())
+                        uid: usernameValue.toLowerCase()
                     })
                     goto("/");
                 }
             }).catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                console.log(errorMessage);
+                errorText = errorMessage;
             });
     }
 
     async function signinWithPassword() {
+        if (usernameValue == null || usernameValue == "") {
+            errorText = "Firebase: Error (auth/username-cannot-be-empty).";
+            return;
+        }
+
         const auth = getAuth();
         
         const docRef = doc(db, "users", usernameValue.toLowerCase());
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            console.warn(`User with username ${usernameValue.toLowerCase()} already exists.`);
+            errorText = "Firebase: Error (auth/user-already-exists).";
             return;
         }
 
@@ -55,13 +65,12 @@
             if (result) {
                 await setDoc(doc(db, 'users', usernameValue.toLowerCase()), {
                     "timestamp": Timestamp.fromMillis(Date.now()),
+                    "email": auth.currentUser?.email,
                     "friends": [],
-                    "posts": [],
-                    "styling": usernameValue
+                    "posts": []
                 })
                 userData.set({
-                    uid: usernameValue.toLowerCase(),
-                    username: usernameValue
+                    uid: usernameValue.toLowerCase()
                 })
                 goto("/");
             }
@@ -69,43 +78,38 @@
         .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            console.log(errorMessage);
+            errorText = errorMessage
         });
-    }
-
-    function getDisplayName() {
-        const auth = getAuth();
-		if (auth.currentUser) {
-			if (auth.currentUser.displayName) {
-				var displayName = auth.currentUser?.displayName.replace(/ /g,'').toLocaleLowerCase();
-				return displayName + Math.floor(Math.random() * 99);
-			}
-		}
     }
 </script>
 
-<section class="d-flex flex-col">
-    <div class="card px-4 py-5">
-        <form>
-            <div class="form-group">
-                <label for="usernameInput">Username</label>
-                <input type="email" id="usernameInput" class="form-control" bind:value={usernameValue} placeholder="Enter username">
-            </div>
-            <div class="form-group my-3">
-                <label for="emailInput">Email address</label>
-                <input type="email" id="emailInput" class="form-control" bind:value={emailValue} aria-describedby="emailHelp" placeholder="Enter email">
-                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-            </div>
-            <div class="form-group">
-                <label for="passwordInput">Password</label>
-                <input type="password" id="passwordInput" class="form-control" bind:value={passwordValue} placeholder="Password">
-            </div>
-            <button type="submit" class="btn btn-primary w-100 my-3" on:click={signinWithPassword}>Sign up</button>
-        </form>
-        <span class="text-center">- OR -</span>
-        <button class="btn btn-light border-black w-100 mt-4 d-flex-inline flex-row" on:click={singinWithGoogle}>
+<section class="flex flex-col">
+    <div class="card bg-[#f1f1f1] px-4 py-5 justify-center">
+        <button class="btn border-black w-full mb-4 flex" on:click={singinWithGoogle}>
             <img src={googleLogo} alt="Google Logo" class="mx-1" style="width: 1.5rem;"/>
             Sign up with Google
         </button>
+        <form>
+            <div class="form-group">
+                <span>Username<small class="text-red-800">*</small></span>
+                <input type="text" class="form-control input input-bordered w-full" bind:value={usernameValue} placeholder="Enter username">
+            </div>
+            <div class="form-group my-3">
+                <span>Email address</span>
+                <input type="email" class="form-control input input-bordered w-full" bind:value={emailValue} aria-describedby="emailHelp" placeholder="Enter email">
+                <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group">
+                <span>Password</span>
+                <input type="password" class="form-control input input-bordered w-full mb-3" bind:value={passwordValue} placeholder="Password">
+            </div>
+            <div class="w-full text-center">
+                {#if typeof(errorText) !== 'undefined'}
+                    <span class="text-red-800">{errorText.slice(22, -2).replaceAll("-", " ")}</span>
+                {/if}
+            </div>
+            <button type="submit" class="btn btn-primary w-full mt-3" on:click={signinWithPassword}>Sign up</button>
+        </form>
+        <span class="mt-3 text-center">Fields marked with <small class="text-error">*</small> are mandatory for all signup options.</span>
     </div>
 </section>
