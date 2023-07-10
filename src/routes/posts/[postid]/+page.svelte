@@ -18,8 +18,9 @@
         solved: Boolean;
         tags: any[];
         comments: any[];
+        docSnapshot: any;
         
-        constructor(author: any, timestamp: Timestamp, title: String, content: String, solved: Boolean, tags: any[], comments: any[]) {
+        constructor(author: any, timestamp: Timestamp, title: String, content: String, solved: Boolean, tags: any[], comments: any[], docSnapshot: any) {
             this.author = author;
             this.timestamp = timestamp;
             this.title = title;
@@ -27,12 +28,11 @@
             this.solved = solved;
             this.tags = tags;
             this.comments = comments;
+            this.docSnapshot = docSnapshot;
         }
     }
 
     const postid = $page.params.postid;
-
-    var postReference: any;
 
     var dataLoaded: Boolean = false;
 
@@ -58,9 +58,8 @@
     onMount(async () => {
         unsubscribe = onSnapshot(doc(db, "posts", postid), async (docSnapshot) => {
             if (docSnapshot.exists()) {
-                postReference = docSnapshot;
                 const data = docSnapshot.data()
-                thisPost = new PostModel(data.author, data.timestamp, data.title, data.content, data.solved, data.tags, data.comments);
+                thisPost = new PostModel(data.author, data.timestamp, data.title, data.content, data.solved, data.tags, data.comments, docSnapshot);
 
                 let i = 0;
                 tags = ""
@@ -128,7 +127,7 @@
 <section>
     {#if thisPost != null}
         <div class="flex flex-col justify-center items-center gap-2">
-            <div class="card bg-[#f1f1f1] py-2 px-4 gap-3 w-[52rem]">
+            <div class="card bg-[#f1f1f1] p-4 gap-3 w-[52rem]">
                 {#if dataLoaded}
                     {#if user.uid == thisPost.author}
                         <button class="text-button w-fit" style="margin-left: auto !important;" on:click={async () => {await deletePost()}}>X</button>
@@ -148,11 +147,15 @@
                         </div>
                     {/if}
                     <div class="ml-auto">
+                        <button class="text-button svelte-underlined-text">Share</button>
+                             - 
                         {#if user.uid == thisPost.author}
+                            <button class="text-button svelte-underlined-text" on:click={async () => {await deletePost()}}>Delete Post</button>
+                             - 
                             <button class="text-button svelte-underlined-text" on:click={async () => {await editPost()}}>Edit Post</button>
                             - 
                         {/if}
-                        <a href={`/users/${thisPost.author}`}>{thisPost.author}</a>
+                        <a class="text-accent hover:underline" href={`/users/${thisPost.author}`}>{thisPost.author}</a>
                          - 
                         <span>{new Date(thisPost.timestamp.seconds * 1000).toLocaleString()}</span>
                     </div>
@@ -161,16 +164,17 @@
             <div class="flex flex-col my-2 gap-2">
                 {#if dataLoaded}
                     {#each thisPost.comments as comment, index}
-                        <Answer postAuthor={thisPost.author} messageArray={thisPost.comments} postReference={postReference} index={index} author={comment.author}
-                            content={comment.content} timestamp={comment.timestamp.seconds} solved={comment.solved}/>
+                        <Answer post={thisPost} index={index}/>
                     {/each}
                 {/if}
             </div>
             <div class="card bg-[#f1f1f1] p-4 flex flex-col items-center w-[52rem]">
-                <textarea class="w-full" name="Text1" cols="40" rows="5" bind:value={commentContent}></textarea>
+                <textarea class="textarea textarea-bordered w-full" name="Text1" cols="40" rows="5" bind:value={commentContent}></textarea>
                 <button class="btn btn-primary mt-2 w-fit" style="margin-left: auto !important;" on:click={commentOnPost}>Comment</button>
             </div>
         </div>
+    {:else}
+        <span class="loading loading-dots w-20"></span>
     {/if}
 </section>
 
@@ -184,7 +188,7 @@
     }
 
     .svelte-underlined-text {
-        color: #ff3e00;
+        color: #f87272;
         text-decoration: underline
     }
 </style>

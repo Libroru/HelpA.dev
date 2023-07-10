@@ -110,6 +110,6 @@
             </div>
             <button type="submit" class="btn btn-primary w-full mt-3" on:click={signinWithPassword}>Sign up</button>
         </form>
-        <span class="mt-3 text-center">Fields marked with <small class="text-red-800">*</small> are mandatory for all signup options.</span>
+        <span class="mt-3 text-center">Fields marked with <small class="text-error">*</small> are mandatory for all signup options.</span>
     </div>
 </section>

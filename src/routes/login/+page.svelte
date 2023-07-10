@@ -80,7 +80,7 @@
                     <input type="password" class="form-control input input-bordered w-full" bind:value={passwordValue} placeholder="Password">
                 </div>
                 {#if typeof(errorText) !== 'undefined'}
-                    <span class="text-red-800 text-center">{errorText.slice(22, -2).replaceAll("-", " ")}</span>
+                    <span class="text-error text-center">{errorText.slice(22, -2).replaceAll("-", " ")}</span>
                 {/if}
                 <button type="submit" class="btn btn-primary w-full mt-3" on:click={loginWithPassword}>Login</button>
             </form>

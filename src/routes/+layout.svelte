@@ -45,7 +45,7 @@
 
 		<div class="navbar-end">
 			{#if userLoggedIn}
-				<button class="btn btn-primary" on:click={() => {showPopup = !showPopup}}>{user.uid}</button>
+				<button class="btn btn-accent" on:click={() => {showPopup = !showPopup}}>{user.uid}</button>
 			{:else}
 				<div>
 					<button class="btn btn-primary mx-2" on:click={() => {goto("/signup")}}>Sign up</button>
@@ -57,7 +57,7 @@
 
 	<div class="p-2" style="position: absolute; top: 50px; right: 0; z-index: 50;">
 		{#if showPopup}
-			<div class="card card-bordered bg-[#f1f1f1] m-2 mt-4 border-[#c7c7c733] sticky right-0 w-40 text-center gap-2">
+			<div class="card card-bordered bg-[#f1f1f1] m-2 mt-4 border-[#c7c7c733] sticky right-0 w-40 text-center gap-2 shadow-lg">
 				<a on:click={() => {showPopup = !showPopup}} class="py-2" href={`/users/${user.uid}`}>My Profile</a>
 				<a class="py-2" on:click={async () => {await logout(); showPopup = !showPopup}} href="/">Logout</a>
 			</div>

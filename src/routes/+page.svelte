@@ -76,7 +76,7 @@
 					<textarea class="transition textarea textarea-bordered focus:input-accent bg-[#f1f1f1] hover:bg-[#e3e3e3]" placeholder="Hey guys! I just wanted to ask how to center a div in CSS?" bind:value={postContentInput}/>
 					<input class="transition input input-bordered focus:input-accent bg-[#f1f1f1] hover:bg-[#e3e3e3]" type="text" placeholder="html, css" bind:value={postTagsInput}/>
 					<div class="card-actions w-full flex justify-end md:mt-2 mb-4 md:mb-0">
-						<button class="btn btn-secondary w-full md:w-fit" on:click={createPost}>Create Post</button>
+						<button class="btn btn-primary w-full md:w-fit" on:click={createPost}>Create Post</button>
 					</div>
 				</div>
 			</div>

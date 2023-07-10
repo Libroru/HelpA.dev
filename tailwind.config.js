@@ -13,7 +13,7 @@ export default {
         helpadev: {
           "primary": "#121212",
           "secondary": "#484848",
-          "accent": "#d16947",
+          "accent": "#f87272",
           "neutral": "#484848",
           "base-100": "#FAFAFA",
           "info": "#3abff8",
