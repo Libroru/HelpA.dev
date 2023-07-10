@@ -18,7 +18,7 @@
 	<div class="flex flex-row gap-2 items-center">
 		<div class="flex flex-row flex-wrap gap-1 flex-1">
 			{#each tags as tag}
-				<a class="card px-2 py-1 bg-accent text-white" href={`/tags/${tag}`}>{tag}</a>
+				<a class="badge badge-accent text-white" href={`/tags/${tag}`}>{tag}</a>
 			{/each}
 		</div>
 		<span class="ml-auto">{creationDate}</span>

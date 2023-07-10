@@ -15,21 +15,25 @@
     var errorText: String;
 
     function singinWithGoogle() {
+        if (usernameValue == null || usernameValue == "") {
+            errorText = "Firebase: Error (auth/username-cannot-be-empty).";
+            return;
+        }
+
         const provider = new GoogleAuthProvider();
         const auth = getAuth();
         signInWithPopup(auth, provider)
             .then(async (result) => {
                 const credential = GoogleAuthProvider.credentialFromResult(result);
                 if (credential) {
-                    const displayName = getDisplayName();
-                    await setDoc(doc(db, 'users', String(displayName).toLowerCase()), {
+                    await setDoc(doc(db, 'users', usernameValue.toLowerCase()), {
                         "timestamp": Timestamp.fromMillis(Date.now()),
                         "email": auth.currentUser?.email,
                         "friends": [],
                         "posts": []
                     });
                     userData.set({
-                        uid: String(displayName).toLowerCase()
+                        uid: usernameValue.toLowerCase()
                     })
                     goto("/");
                 }
@@ -41,6 +45,11 @@
     }
 
     async function signinWithPassword() {
+        if (usernameValue == null || usernameValue == "") {
+            errorText = "Firebase: Error (auth/username-cannot-be-empty).";
+            return;
+        }
+
         const auth = getAuth();
         
         const docRef = doc(db, "users", usernameValue.toLowerCase());
@@ -72,16 +81,6 @@
             errorText = errorMessage
         });
     }
-
-    function getDisplayName() {
-        const auth = getAuth();
-		if (auth.currentUser) {
-			if (auth.currentUser.displayName) {
-				var displayName = auth.currentUser?.displayName.replace(/ /g,'').toLocaleLowerCase();
-				return displayName + Math.floor(Math.random() * 99);
-			}
-		}
-    }
 </script>
 
 <section class="flex flex-col">
@@ -92,8 +91,8 @@
         </button>
         <form>
             <div class="form-group">
-                <span>Username</span>
-                <input type="email" class="form-control input input-bordered w-full" bind:value={usernameValue} placeholder="Enter username">
+                <span>Username<small class="text-red-800">*</small></span>
+                <input type="text" class="form-control input input-bordered w-full" bind:value={usernameValue} placeholder="Enter username">
             </div>
             <div class="form-group my-3">
                 <span>Email address</span>
@@ -111,5 +110,6 @@
             </div>
             <button type="submit" class="btn btn-primary w-full mt-3" on:click={signinWithPassword}>Sign up</button>
         </form>
+        <span class="mt-3 text-center">Fields marked with <small class="text-red-800">*</small> are mandatory for all signup options.</span>
     </div>
 </section>

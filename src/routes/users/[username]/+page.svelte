@@ -43,5 +43,7 @@
                 </div>
             </div>
         </div>
+    {:else}
+        <span class="loading loading-dots w-20"></span>
     {/if}
 </section>

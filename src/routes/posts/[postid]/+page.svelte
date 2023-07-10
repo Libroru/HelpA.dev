@@ -134,16 +134,16 @@
                         <button class="text-button w-fit" style="margin-left: auto !important;" on:click={async () => {await deletePost()}}>X</button>
                     {/if}
                     {#if editing}
-                        <input class="text-center" bind:value="{thisPost.title}">
-                        <textarea style="max-height: 300px;" bind:value={thisPost.content}></textarea>
-                        <input bind:value={tags}>
+                        <input class="input input-bordered text-xl font-bold" bind:value="{thisPost.title}">
+                        <textarea class="textarea textarea-bordered" style="max-height: 300px;" bind:value={thisPost.content}></textarea>
+                        <input class="input input-bordered" bind:value={tags}>
                         <button class="btn btn-primary mt-2 mr-2 mb-2 w-fit" style="margin-left: auto !important;" on:click={async () => {await editPost()}}>Finished</button>
                     {:else}
                         <h1 class="text-xl font-bold max-w-full">{thisPost.title}</h1>
                         <p class="whitespace-pre-line max-w-full">{thisPost.content}</p>
                         <div class="flex gap-1 flex-wrap">
                             {#each thisPost.tags as tag}
-                                <a href={`/tags/${tag}`} class="card bg-accent px-2 py-1 text-white w-fit">{tag}</a>
+                                <a href={`/tags/${tag}`} class="badge badge-accent text-white w-fit">{tag}</a>
                             {/each}
                         </div>
                     {/if}

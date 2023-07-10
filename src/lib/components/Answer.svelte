@@ -79,7 +79,7 @@
     {/if}
     <div class="flex flex-col" style="gap: 4px;">
         {#if editing}
-            <textarea class="mb-2 whitespace-pre-line" bind:value={content}></textarea>
+            <textarea class="textarea textarea-bordered mb-2 whitespace-pre-line" bind:value={content}></textarea>
             <button class="btn btn-primary mr-2 mb-2 w-fit ml-auto" on:click={() => {editing = !editing}}>Finished</button>
         {:else}
             <p class="mb-3 pr-4 whitespace-pre-line max-w-full">{content}</p>
