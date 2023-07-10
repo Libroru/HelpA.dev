@@ -45,7 +45,7 @@
 
 		<div class="navbar-end">
 			{#if userLoggedIn}
-				<button class="btn btn-accent" on:click={() => {showPopup = !showPopup}}>{user.uid}</button>
+				<button class="btn btn-accent text-white" on:click={() => {showPopup = !showPopup}}>{user.uid}</button>
 			{:else}
 				<div>
 					<button class="btn btn-primary mx-2" on:click={() => {goto("/signup")}}>Sign up</button>

@@ -147,12 +147,10 @@
                         </div>
                     {/if}
                     <div class="ml-auto">
-                        <button class="text-button svelte-underlined-text">Share</button>
-                             - 
                         {#if user.uid == thisPost.author}
-                            <button class="text-button svelte-underlined-text" on:click={async () => {await deletePost()}}>Delete Post</button>
+                            <button class="text-button text-accent hover:underline" on:click={async () => {await deletePost()}}>Delete Post</button>
                              - 
-                            <button class="text-button svelte-underlined-text" on:click={async () => {await editPost()}}>Edit Post</button>
+                            <button class="text-button text-accent hover:underline" on:click={async () => {await editPost()}}>Edit Post</button>
                             - 
                         {/if}
                         <a class="text-accent hover:underline" href={`/users/${thisPost.author}`}>{thisPost.author}</a>

@@ -107,22 +107,20 @@
     <div class="flex flex-col gap-8 flex-1">
         {#if editing}
             <textarea class="textarea textarea-bordered mb-2 whitespace-pre-line" bind:value={content}></textarea>
-            <button class="btn btn-primary mr-2 mb-2 w-fit ml-auto" on:click={() => {editing = !editing}}>Finished</button>
+            <button class="btn btn-primary mr-2 mb-2 w-fit ml-auto" on:click={() => {editComment()}}>Finished</button>
         {:else}
             <p class="mb-3 pr-4 whitespace-pre-line max-w-full">{content}</p>
         {/if}
         <div class="flex flex-col">
             <div class="flex flex-row">
                 {#if postAuthor == user.uid}
-                    <button class="text-button svelte-underlined-text" on:click={markAsSolved}>Mark as solved</button>
+                    <button class="text-button text-accent hover:underline" on:click={markAsSolved}>Mark as solved</button>
                 {/if}
                 <div class="ml-auto">
                     {#if user.uid == author}
-                    <button class="text-button svelte-underlined-text">Share</button>
+                    <button class="text-button text-accent hover:underline" on:click={async () => {await deleteComment()}}>Delete Comment</button>
                      - 
-                    <button class="text-button svelte-underlined-text" on:click={async () => {await deleteComment()}}>Delete Comment</button>
-                     - 
-                    <button class="text-button svelte-underlined-text" on:click={async () => {await editComment()}}>Edit Comment</button>
+                    <button class="text-button text-accent hover:underline" on:click={async () => {await editComment()}}>Edit Comment</button>
                      - 
                     {/if}
                     <a class="text-accent hover:underline" href={`/users/${author}`}>{author}</a>
