@@ -7,6 +7,7 @@
 
 	import { db } from '$lib/firebase';
 	import { userData } from '$lib/stores';
+	import { getAuth } from 'firebase/auth';
 
 	var posts: any[] = [];
 	var postsRef: any;
@@ -40,10 +41,12 @@
 			const postData: any = doc.data();
 			postData.uid = doc.id;
 			posts = [...posts, postData];
+			posts.sort((a, b) => b.timestamp - a.timestamp);
 		});
 	}
 
 	async function createPost() {
+		if(getAuth().currentUser == null) return;
 		var postTags: any[] = postTagsInput.split(", ");
 
 		const postRef = await addDoc(collection(db, "posts"), {
@@ -64,17 +67,21 @@
 </svelte:head>
 
 <section>
-	<div class="d-flex flex-column">
-		<div class="card p-4 d-flex flex-column gap-2">
-			<h1 style="margin-right: auto;">Create a post</h1>
-			<input type="text" placeholder="How to center a div" bind:value={postTitleInput}/>
-			<textarea placeholder="Hey guys! I just wanted to ask how to center a div in CSS?" bind:value={postContentInput}/>
-			<input type="text" placeholder="html, css" bind:value={postTagsInput}/>
-			<button class="btn btn-primary" on:click={createPost}>Create Post</button>
+	<div class="flex flex-col gap-2 md:gap-5">
+		<div class="md:card md:card-bordered md:border-[#c7c7c733] bg-[#f1f1f1]">
+			<div class="md:card-body flex flex-col gap-2 md:gap-4">
+				<h1 class="text-2xl card-title">Create a post</h1>
+				<input class="transition input input-bordered focus:input-accent bg-[#f1f1f1] hover:bg-[#e3e3e3]" type="text" placeholder="How to center a div" bind:value={postTitleInput}/>
+				<textarea class="transition textarea textarea-bordered focus:input-accent bg-[#f1f1f1] hover:bg-[#e3e3e3]" placeholder="Hey guys! I just wanted to ask how to center a div in CSS?" bind:value={postContentInput}/>
+				<input class="transition input input-bordered focus:input-accent bg-[#f1f1f1] hover:bg-[#e3e3e3]" type="text" placeholder="html, css" bind:value={postTagsInput}/>
+				<div class="card-actions w-full flex justify-end md:mt-2 mb-4 md:mb-0">
+					<button class="btn btn-secondary w-full md:w-fit" on:click={createPost}>Create Post</button>
+				</div>
+			</div>
 		</div>
 		{#each posts as post}
 			<Question postId={post.uid} tags={post.tags} title={post.title}
-				description={post.content} author={post.author} creationDate={new Date(post.timestamp.seconds * 1000).toLocaleString()}/>
+				description={post.content} author={post.author} creationDate={new Date(post.timestamp.seconds * 1000).toDateString().slice(4)}/>
 		{/each}
 	</div>
 </section>

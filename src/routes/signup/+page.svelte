@@ -12,6 +12,7 @@
     var passwordValue: any;
     var emailValue: any;
     var usernameValue: any;
+    var errorText: String;
 
     function singinWithGoogle() {
         const provider = new GoogleAuthProvider();
@@ -35,7 +36,7 @@
             }).catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                console.log(errorMessage);
+                errorText = errorMessage;
             });
     }
 
@@ -46,7 +47,7 @@
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            console.warn(`User with username ${usernameValue.toLowerCase()} already exists.`);
+            errorText = "Firebase: Error (auth/user-already-exists).";
             return;
         }
 
@@ -68,7 +69,7 @@
         .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            console.log(errorMessage);
+            errorText = errorMessage
         });
     }
 
@@ -83,28 +84,32 @@
     }
 </script>
 
-<section class="d-flex flex-col">
-    <div class="card px-4 py-5">
-        <form>
-            <div class="form-group">
-                <label for="usernameInput">Username</label>
-                <input type="email" id="usernameInput" class="form-control" bind:value={usernameValue} placeholder="Enter username">
-            </div>
-            <div class="form-group my-3">
-                <label for="emailInput">Email address</label>
-                <input type="email" id="emailInput" class="form-control" bind:value={emailValue} aria-describedby="emailHelp" placeholder="Enter email">
-                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-            </div>
-            <div class="form-group">
-                <label for="passwordInput">Password</label>
-                <input type="password" id="passwordInput" class="form-control" bind:value={passwordValue} placeholder="Password">
-            </div>
-            <button type="submit" class="btn btn-primary w-100 my-3" on:click={signinWithPassword}>Sign up</button>
-        </form>
-        <span class="text-center">- OR -</span>
-        <button class="btn btn-light border-black w-100 mt-4 d-flex-inline flex-row" on:click={singinWithGoogle}>
+<section class="flex flex-col">
+    <div class="card bg-[#f1f1f1] px-4 py-5 justify-center">
+        <button class="btn border-black w-full mb-4 flex" on:click={singinWithGoogle}>
             <img src={googleLogo} alt="Google Logo" class="mx-1" style="width: 1.5rem;"/>
             Sign up with Google
         </button>
+        <form>
+            <div class="form-group">
+                <span>Username</span>
+                <input type="email" class="form-control input input-bordered w-full" bind:value={usernameValue} placeholder="Enter username">
+            </div>
+            <div class="form-group my-3">
+                <span>Email address</span>
+                <input type="email" class="form-control input input-bordered w-full" bind:value={emailValue} aria-describedby="emailHelp" placeholder="Enter email">
+                <small class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group">
+                <span>Password</span>
+                <input type="password" class="form-control input input-bordered w-full mb-3" bind:value={passwordValue} placeholder="Password">
+            </div>
+            <div class="w-full text-center">
+                {#if typeof(errorText) !== 'undefined'}
+                    <span class="text-red-800">{errorText.slice(22, -2).replaceAll("-", " ")}</span>
+                {/if}
+            </div>
+            <button type="submit" class="btn btn-primary w-full mt-3" on:click={signinWithPassword}>Sign up</button>
+        </form>
     </div>
 </section>

@@ -16,7 +16,7 @@
     export var author: any;
     export var postAuthor: any;
 
-    $: shadow = solved ? "0px 0px 10px yellow" : "";
+    $: shadow = solved ? "0px 0px 10px #d16947" : "";
 
     var editing: Boolean = false;
     var oldText: String;
@@ -73,25 +73,23 @@
     }
 </script>
 
-<div class="card px-4 py-2 d-flex flex-column" style="width: 48rem;" style:box-shadow={shadow}>
-    <div class="w-100 position-relative" style="height: 1.5rem;">
-        {#if author == user.uid}
-            <button class="position-absolute text-button" style="right: 0;" on:click={deleteComment}>X</button>
-        {/if}
-    </div>
-    <div class="d-flex flex-column" style="gap: 4px;">
+<div class="card bg-[#f1f1f1] p-4 w-[52rem]" style:box-shadow={shadow}>
+    {#if author == user.uid}
+        <button class="text-button w-fit" style="margin-left: auto !important;" on:click={deleteComment}>X</button>
+    {/if}
+    <div class="flex flex-col" style="gap: 4px;">
         {#if editing}
-            <textarea class="mb-2" style="white-space: pre-line; max-height: 300px;" bind:value={content}></textarea>
-            <button class="btn btn-primary mr-2 mb-2" style="width: fit-content; margin-left: auto;" on:click={() => {editing = !editing}}>Finished</button>
+            <textarea class="mb-2 whitespace-pre-line" bind:value={content}></textarea>
+            <button class="btn btn-primary mr-2 mb-2 w-fit ml-auto" on:click={() => {editing = !editing}}>Finished</button>
         {:else}
-            <p class="mb-3" style="white-space: pre-line; max-width: 100%; padding-right: 1rem;">{content}</p>
+            <p class="mb-3 pr-4 whitespace-pre-line max-w-full">{content}</p>
         {/if}
-        <div class="d-flex flex-column">
-            <div class="d-inline-flex flex-row">
+        <div class="flex flex-col">
+            <div class="flex flex-row">
                 {#if postAuthor == user.uid}
                     <button class="text-button svelte-underlined-text" on:click={markAsSolved}>Mark as solved</button>
                 {/if}
-                <div style="margin-left: auto;">
+                <div class="ml-auto">
                     {#if user.uid == author}
                     <button class="text-button svelte-underlined-text" on:click={async () => {await editComment()}}>Edit Comment</button>
                      - 

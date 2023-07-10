@@ -8,7 +8,7 @@
 
 	import { userData } from '$lib/stores';
 
-	var userLoggedIn = false;
+	var userLoggedIn = true;
 	var showPopup = false;
 
 	var user: any;
@@ -36,33 +36,35 @@
 </script>
 
 <div class="app">
-	<nav class="navbar navbar-light bg-light p-2">
-		<a class="navbar-brand" href="/">HelpA.dev</a>
-		<form class="d-inline-flex">
-			<input class="form-control mx-2" type="search" placeholder="Search" aria-label="Search" size="50">
-			<button class="btn btn-outline-success" type="submit">Search</button>
+	<nav class="navbar py-4 px-4">
+		<a class="navbar-start md:text-2xl font-bold" href="/">HelpA.dev</a>
+		<form class="md:navbar-center hidden md:block">
+			<input class="transition input input-bordered focus:input-accent bg-[#f1f1f1] hover:bg-[#e3e3e3] mx-2" type="search" placeholder="Search" aria-label="Search" size="50">
+			<button class="btn btn-secondary" type="submit">Search</button>
 		</form>
 
-		{#if userLoggedIn}
-			<button class="btn btn-primary" on:click={() => {showPopup = !showPopup}}>{user.uid}</button>
-		{:else}
-			<div class="d-inline-flex">
-				<button class="btn btn-primary mx-2" on:click={() => {goto("/signup")}}>Sign up</button>
-				<button class="btn btn-secondary" on:click={() => {goto("/login")}}>Login</button>
-			</div>
-		{/if}
+		<div class="navbar-end">
+			{#if userLoggedIn}
+				<button class="btn btn-primary" on:click={() => {showPopup = !showPopup}}>{user.uid}</button>
+			{:else}
+				<div>
+					<button class="btn btn-primary mx-2" on:click={() => {goto("/signup")}}>Sign up</button>
+					<button class="btn btn-secondary" on:click={() => {goto("/login")}}>Login</button>
+				</div>
+			{/if}
+		</div>
 	</nav>
 
-	<div class="p-2" style="position: absolute; top: 50px; right: 0;">
+	<div class="p-2" style="position: absolute; top: 50px; right: 0; z-index: 50;">
 		{#if showPopup}
-			<div class="card py-2" style="display: sticky; right: 0; width: 10rem; text-align: center; gap: 0.5rem;">
+			<div class="card card-bordered bg-[#f1f1f1] m-2 mt-4 border-[#c7c7c733] sticky right-0 w-40 text-center gap-2">
 				<a on:click={() => {showPopup = !showPopup}} class="py-2" href={`/users/${user.uid}`}>My Profile</a>
 				<a class="py-2" on:click={async () => {await logout(); showPopup = !showPopup}} href="/">Logout</a>
 			</div>
 		{/if}
 	</div>
 
-	<main class="d-flex flex-col justify-content-center align-items-center">
+	<main class="flex justify-center items-center">
 		<slot />
 	</main>
 </div>
@@ -78,7 +80,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 1rem;
+		padding: 2rem;
 		width: 100%;
 		max-width: 64rem;
 		margin: 0 auto;

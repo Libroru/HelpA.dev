@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
-
 	export let tags: any[] = [];
 	export let title: any;
 	export let description: any;
@@ -8,36 +6,22 @@
 	export let creationDate: any;
 
 	export let postId: any;
-
-    function navigateToTag(event: any) {
-		const tag = event.target.innerText;
-    	goto(`/tags/${tag}`);
-	}
-
-	function navigateToPost() {
-		goto(`/posts/${postId}`)
-	}
-
-	function navigateToAuthor() {
-		goto(`/users/${author}`)
-	}
 </script>
 
-<div class="card p-4" style="width: 48rem;" >
-    <a href={`/posts/${postId}`} on:click={navigateToPost} on:keydown={navigateToPost} role="button" tabindex="0">{title}</a>
-	<div on:click={navigateToPost} on:keydown={navigateToPost} tabindex="-1" role="button">
-		<p>{description}</p>
+<a href={`/posts/${postId}`}>
+	<div class="card card-bordered border-[#c7c7c733] bg-[#f1f1f1] hover:bg-[#e3e3e3] p-4 w-full flex flex-col gap-2">
+    <div class="flex">
+		<a class="text-xl font-bold" href={`/posts/${postId}`}>{title}</a>
+		<a class="text-accent ml-auto" href={`/users/${author}`}>{author}</a>
 	</div>
-	<div class="d-flex flex-column" style="gap: 4px;">
-		<div class="d-inline-flex flex-row" style="gap: 0.25rem;">
+	<p>{description}</p>
+	<div class="flex flex-row gap-2 items-center">
+		<div class="flex flex-row flex-wrap gap-1 flex-1">
 			{#each tags as tag}
-				<span class="card px-1 bg-info text-white" style="width: fit-content;"
-					on:click={navigateToTag} on:keydown={navigateToTag} role="button" tabindex="0">{tag}</span>
+				<a class="card px-2 py-1 bg-accent text-white" href={`/tags/${tag}`}>{tag}</a>
 			{/each}
-			<div class="d-flex flex-row" style="gap: 0.25rem; margin-left: auto;">
-				<a href={`/users/${author}`} on:click={navigateToAuthor} on:keydown={navigateToAuthor} role="button" tabindex="0">{author}</a>
-				<span> - {creationDate}</span>
-			</div>
 		</div>
+		<span class="ml-auto">{creationDate}</span>
 	</div>
 </div>
+</a>

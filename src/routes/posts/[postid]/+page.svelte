@@ -127,30 +127,30 @@
 
 <section>
     {#if thisPost != null}
-        <div class="d-flex flex-column" style="gap: 0.5rem;">
-            <div class="card py-2 px-4" style="width: 48rem;">
+        <div class="flex flex-col justify-center items-center gap-2">
+            <div class="card bg-[#f1f1f1] py-2 px-4 gap-3 w-[52rem]">
                 {#if dataLoaded}
                     {#if user.uid == thisPost.author}
-                        <button class="text-button" style="width: fit-content; margin-left: auto;" on:click={async () => {await deletePost()}}>X</button>
+                        <button class="text-button w-fit" style="margin-left: auto !important;" on:click={async () => {await deletePost()}}>X</button>
                     {/if}
                     {#if editing}
                         <input class="text-center" bind:value="{thisPost.title}">
                         <textarea style="max-height: 300px;" bind:value={thisPost.content}></textarea>
                         <input bind:value={tags}>
-                        <button class="btn btn-primary mt-2 mr-2 mb-2" style="width: fit-content; margin-left: auto;" on:click={async () => {await editPost()}}>Finished</button>
+                        <button class="btn btn-primary mt-2 mr-2 mb-2 w-fit" style="margin-left: auto !important;" on:click={async () => {await editPost()}}>Finished</button>
                     {:else}
-                        <h1 style="max-width: 100%;">{thisPost.title}</h1>
-                        <p style="white-space: pre-line; max-width: 100%;">{thisPost.content}</p>
-                        <div class="d-inline-flex gap-1 flex-wrap">
+                        <h1 class="text-xl font-bold max-w-full">{thisPost.title}</h1>
+                        <p class="whitespace-pre-line max-w-full">{thisPost.content}</p>
+                        <div class="flex gap-1 flex-wrap">
                             {#each thisPost.tags as tag}
-                                <a href={`/tags/${tag}`} class="card px-1 bg-info text-white" style="width: fit-content;">{tag}</a>
+                                <a href={`/tags/${tag}`} class="card bg-accent px-2 py-1 text-white w-fit">{tag}</a>
                             {/each}
                         </div>
                     {/if}
-                    <div style="margin-left: auto;">
+                    <div class="ml-auto">
                         {#if user.uid == thisPost.author}
-                        <button class="text-button svelte-underlined-text" on:click={async () => {await editPost()}}>Edit Post</button>
-                         - 
+                            <button class="text-button svelte-underlined-text" on:click={async () => {await editPost()}}>Edit Post</button>
+                            - 
                         {/if}
                         <a href={`/users/${thisPost.author}`}>{thisPost.author}</a>
                          - 
@@ -158,7 +158,7 @@
                     </div>
                 {/if}
             </div>
-            <div class="d-flex flex-column my-2" style="gap: 0.5rem;">
+            <div class="flex flex-col my-2 gap-2">
                 {#if dataLoaded}
                     {#each thisPost.comments as comment, index}
                         <Answer postAuthor={thisPost.author} messageArray={thisPost.comments} postReference={postReference} index={index} author={comment.author}
@@ -166,9 +166,9 @@
                     {/each}
                 {/if}
             </div>
-            <div class="card p-4 d-flex flex-column align-items-center">
-                <textarea name="Text1" cols="40" rows="5" bind:value={commentContent} style="width: 100%;"></textarea>
-                <button class="btn btn-primary m-2" style="width: 8rem;" on:click={commentOnPost}>Comment</button>
+            <div class="card bg-[#f1f1f1] p-4 flex flex-col items-center w-[52rem]">
+                <textarea class="w-full" name="Text1" cols="40" rows="5" bind:value={commentContent}></textarea>
+                <button class="btn btn-primary mt-2 w-fit" style="margin-left: auto !important;" on:click={commentOnPost}>Comment</button>
             </div>
         </div>
     {/if}
